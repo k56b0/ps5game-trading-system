@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: ps5GameTradingSystem
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://localhost:3306/ps5game?rewriteBatchedStatements=true&useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+server:
+  servlet:
+    context-path: /game
+  port: 7777

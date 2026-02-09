@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zxy.ps5gametradingsystem.mapper.OrderMapper">
+    <!-- 订单明细结果映射 -->
+    <resultMap id="OrderDetailsResultMap" type="Order_details">
+        <id property="id" column="id"/>
+        <result property="orderId" column="order_id"/>
+        <result property="gameName" column="game_name"/>
+        <result property="price" column="price"/>
+        <result property="quantity" column="quantity"/>
+    </resultMap>
+
+    <!-- 嵌套查询的结果映射 -->
+    <resultMap id="OrderWithDetailsNestedResultMap" type="Order">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="orderTime" column="order_time"/>
+        <result property="orderAddress" column="order_address"/>
+        <result property="sum" column="sum"/>
+        <!-- 关键：嵌套查询配置 -->
+            <!--  column="{orderId=id}:传递参数到子查询，使用命名参数 -->
+            <!-- 引用子查询ID ：select="selectOrderDetailsByOrderId"-->
+        <collection property="orderDetails"
+                    ofType="Order_details"
+                    column="{orderId=id}"
+                    select="selectOrderDetailsByOrderId"/>
+    </resultMap>
+
+    <!-- 使用嵌套查询的分页 -->
+    <select id="selectOrderPage" resultMap="OrderWithDetailsNestedResultMap">
+        SELECT
+            id,
+            user_id,
+            order_time,
+            order_address,
+            sum
+        FROM `order`
+        WHERE user_id = #{userId}
+        ORDER BY order_time DESC
+    </select>
+
+    <!-- 主查询：只查询订单表 -->
+    <select id="selectOrderWithDetails" resultMap="OrderWithDetailsNestedResultMap">
+        SELECT
+            id,
+            user_id,
+            order_time,
+            order_address,
+            sum
+        FROM `order`
+        WHERE user_id =#{userId}
+    </select>
+
+    <!-- 子查询：根据订单ID查询明细 -->
+    <select id="selectOrderDetailsByOrderId" resultMap="OrderDetailsResultMap">
+        SELECT
+            id,
+            order_id,
+            game_name,
+            quantity,
+            price
+        FROM `order_details`
+        WHERE order_id =#{orderId}
+    </select>
+
+</mapper>

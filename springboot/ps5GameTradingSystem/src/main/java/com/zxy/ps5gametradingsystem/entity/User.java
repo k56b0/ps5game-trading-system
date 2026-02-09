@@ -6,12 +6,15 @@ import lombok.Data;
 @Data
 @TableName("`user`")
 public class User {
-    private Long id;
-    private String name;
+    private String id;
+    private String userName;
+    private String gender;
     private String birth;
-    private String address;
+    private String password;
+    private Integer checkIn;
     private String email;
-    private String passw;
-    private Integer checkin;
+    private String address;
     private String answer;
+    private String checkTime;
+    private Integer money;
 }

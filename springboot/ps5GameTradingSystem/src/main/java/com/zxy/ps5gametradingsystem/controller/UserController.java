@@ -15,9 +15,7 @@ public class UserController {
     // 登录方法，参数改为邮箱和密码
     @PostMapping("/login")
     public Result login(@RequestBody User request) {
-//        System.out.println(request);
         User user = userService.login(request.getEmail(), request.getPassword());
-        System.out.println(user);
         if (user != null) {
             // 登录成功，返回用户信息
             return Result.success(user);
@@ -27,24 +25,34 @@ public class UserController {
         }
     }
     //用户保存用户信息
-    @PostMapping("/updateUser")
+    @PostMapping("/update")
     public Result update (@RequestBody User request){
+        System.out.println("接收到的用户对象：" + request);  // 确保 toString() 完整打印所有字段
+        System.out.println("ID: " + request.getId());
+        System.out.println("userName: " + request.getUserName());
+        System.out.println("checkIn: " + request.getCheckIn());
+        System.out.println("address: " + request.getAddress());
         User updateData = userService.update(request);
         if( updateData !=null){
+            //保存成功
+            System.out.println("用户保存用户信息");
             return Result.success(updateData);
+
         }else {
-            // 登录失败
+            //保存失败
             return Result.error();
         }
     }
 
     //用户注册
-    @PostMapping("/registerUser")
+    @PostMapping("/register")
     public Result register (@RequestBody User request){
         if(userService.register(request)){
+            //注册成功
             return Result.success();
         }else{
-            return Result.error();
+            //注册失败
+            return Result.error(400,"邮箱已被注册",null);
         }
     }
 }

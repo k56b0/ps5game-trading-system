@@ -10,7 +10,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Data
 
-// 返回结果 统一类
+/**
+ * Result类：用于统一回请求结果
+ */
 public class Result implements Serializable {
     private  static  final  long serialVersionUID =1L;
     // 状态码
@@ -19,17 +21,22 @@ public class Result implements Serializable {
     private String message;
     // 返回的属性类型
     private Object data;
-
     /**
-     * 直接返回成功结果
+     *不带结果直接返回成功，通用状态码:200
+     */
+    public static Result success() {
+        Result r = new Result();
+        r.setCode(200);
+        r.setMessage("ok");
+        return r;
+    }
+    /**
+     * 直接返回成功结果，通用状态码:200
      * @param data
-     * @return
      */
     public static Result success(Object data) {
-//        return new Result(200, "success", data);
-        return success(200, "success", data);
+        return success(200, "ok", data);
     }
-
     /**
      * 自定义返回成功结果
      * @param code
@@ -45,25 +52,12 @@ public class Result implements Serializable {
         return r;
     }
     /**
-     *不带结果直接返回成功
-     ★ @return
-     */
-    public static Result success() {
-        Result r = new Result();
-        r.setCode(200);
-        r.setMessage("操作成功");
-        return r;
-    }
-
-    /**
      *直接返回失败信息
      @return
      */
     public static Result error() {
-        return new Result(400,"操作失败",null);
+        return new Result(400,"error",null);
     }
-
-
     /**
      * 自定义返回失败结果
      * @param code
@@ -79,8 +73,6 @@ public class Result implements Serializable {
         r.setData(data);
         return r;
     }
-
-
 }
 
 

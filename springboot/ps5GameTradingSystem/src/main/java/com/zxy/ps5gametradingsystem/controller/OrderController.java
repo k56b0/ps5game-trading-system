@@ -16,14 +16,15 @@ public class OrderController {
     @Autowired
     private Order_detailsService order_detailsService;
     //查询所有订单
-    @GetMapping("/queryOrders")
-    public Result queryOrders(@RequestParam(defaultValue = "1") String userId,
+    @GetMapping("/queryAll")
+    public Result queryAll(@RequestParam(defaultValue = "1") String userId,
                               @RequestParam(defaultValue = "1") Integer pageNum) {
         int pageSize = 2;
         // 创建分页对象
         Page<Order> page = new Page<>(pageNum, pageSize);
         // 调用分页查询方法
         Page<Order> orderPage = orderService.queryOrderPage(page, userId);
+        System.out.println("查询成功");
         // 判断是否有数据
         if (orderPage != null && orderPage.getRecords() != null && !orderPage.getRecords().isEmpty()) {
             return Result.success(orderPage);

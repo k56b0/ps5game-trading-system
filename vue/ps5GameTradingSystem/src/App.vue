@@ -17,7 +17,7 @@
               <RouterLink v-else to="/PromptPage" class="nav-link" active-class="active">二手回收</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink v-if="isLoginMark" to="/PersonalCenter" class="nav-link" active-class="active">个人中心</RouterLink>
+              <RouterLink v-if="isLoginMark" to="/PersonalCenter/MyInfo" class="nav-link" active-class="active">个人中心</RouterLink>
               <RouterLink v-else to="/PromptPage" class="nav-link" active-class="active">个人中心</RouterLink>
             </li>
             <li class="nav-item">
@@ -80,18 +80,18 @@
 // 引入 routerView,让路由器知道，把 视图放在哪里
 import {RouterView,RouterLink}from 'vue-router'
 import {ref} from 'vue'
-import {useLoginStore} from '@/store/login.ts'
+import {useUserStore} from '@/store/userStore.ts'
 /* 引入storeToRefs */
 import { storeToRefs } from 'pinia'
 
 // 默认 没有登陆
 // let isLoginMark = ref(false)
 /* 使用storeToRefs转换useLoginStore()，随后解构 */
-const {isLoginMark} = storeToRefs(useLoginStore())
-const {myInfo:{value:temp}} = storeToRefs(useLoginStore())
+const {isLoginMark} = storeToRefs(useUserStore())
+const {myInfo:{value:temp}} = storeToRefs(useUserStore())
 
 function userCheckIn() {
-  temp.checkin +=1
+  temp.checkIn +=1
 }
 
 </script>

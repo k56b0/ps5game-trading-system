@@ -1,15 +1,16 @@
 package com.zxy.ps5gametradingsystem.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zxy.ps5gametradingsystem.common.Result;
 import com.zxy.ps5gametradingsystem.entity.Recharge_record;
+import com.zxy.ps5gametradingsystem.entity.Recycle;
 import com.zxy.ps5gametradingsystem.entity.User;
 import com.zxy.ps5gametradingsystem.service.Recharge_recordService;
 import com.zxy.ps5gametradingsystem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 @RestController
 @RequestMapping("/recharge_record")
 public class Recharge_recordController {
@@ -19,7 +20,7 @@ public class Recharge_recordController {
     private UserService userService;
 
     //充值
-    @PostMapping("/save")
+    @PutMapping("/save")
     public Result save (@RequestBody Recharge_record s) {
         // 保存充值记录
         rechargeRecordService.save(s);
@@ -44,5 +45,18 @@ public class Recharge_recordController {
             return Result.error();
         }
 
+    }
+    //查询所有充值订单 分页
+    @GetMapping("/queryAll/{id}/{pageNum}")
+    public Result queryAll(@PathVariable String id, @PathVariable Integer pageNum){
+        int pageSize = 2;
+        // 创建分页对象
+        Page<Recharge_record> page = new Page<>(pageNum, pageSize);
+        // 构建查询条件
+        LambdaQueryWrapper<Recharge_record> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Recharge_record::getUserId, id);
+        // 执行分页查询
+        Page<Recharge_record> resultPage = rechargeRecordService.page(page, queryWrapper);
+        return Result.success(resultPage);
     }
 }

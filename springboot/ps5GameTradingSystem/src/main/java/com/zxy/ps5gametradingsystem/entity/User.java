@@ -16,5 +16,4 @@ public class User {
     private String address;
     private String answer;
     private String checkTime;
-    private Integer money;
-}
+    private Integer money;}

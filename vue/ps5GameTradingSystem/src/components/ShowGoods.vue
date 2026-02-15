@@ -10,7 +10,7 @@ import {RouterLink}from 'vue-router'
         热销商品
       </div>
       <div class="col align-self-end">
-        <RouterLink to="/SearchPage"  class="nav-link" >
+        <RouterLink to="/SearchGames"  class="nav-link" >
             查看全部 <i class="bi bi-arrow-up-right-square"></i>
         </RouterLink>
       </div>

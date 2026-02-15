@@ -18,8 +18,8 @@ public class FavoritesController {
     @Autowired
     private ShoppingcarService shoppingcarService;
     //添加进收藏夹（增）
-    @PostMapping("/save")
-    public Result save (@RequestBody Favorites f){
+    @PostMapping("/add")
+    public Result add (@RequestBody Favorites f){
         LambdaQueryWrapper<Favorites> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Favorites::getUserId, f.getUserId())
                     .eq(Favorites::getGameName, f.getGameName());
@@ -31,15 +31,15 @@ public class FavoritesController {
         }
     }
     //删除收藏夹信息
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public Result delete(@PathVariable String id){
         favoritesService.removeById(id);
         return  Result.success();
     }
     //查询用户全部收藏夹信息 分页
-    @GetMapping("/{id}/{pageNum}")
-    public Result list (@PathVariable String id,@PathVariable Integer pageNum){
-        int pageSize = 2;
+    @GetMapping("/queryAll/{id}/{pageNum}")
+    public Result queryAll(@PathVariable String id, @PathVariable Integer pageNum){
+        int pageSize = 4;
         // 创建分页对象
         Page<Favorites> page = new Page<>(pageNum, pageSize);
         // 构建查询条件
@@ -48,11 +48,5 @@ public class FavoritesController {
         // 执行分页查询
         Page<Favorites> resultPage = favoritesService.page(page, queryWrapper);
         return Result.success(resultPage);
-    }
-    //添加到购物车
-    @PutMapping("/addCar")
-    public Result addCar (@RequestBody Shoppingcar s) {
-        shoppingcarService.save(s);
-        return Result.success();
     }
 }

@@ -9,11 +9,10 @@ import MyFavorites from "@/views/MyFavorites.vue";
 import MyRecycle from "@/views/MyRecycle.vue";
 import MyWallet from "@/views/MyWallet.vue";
 import Recycling from "@/views/Recycling.vue";
-import ItemDetail from "@/views/ItemDetail.vue";
 import ShoppingCart from "@/views/ShoppingCart.vue";
-import SearchPage from "@/views/SearchPage.vue";
-import Test from "@/views/Test.vue";
 import PromptPage from "@/views/PromptPage.vue";
+import SearchGames from "@/views/SearchGames.vue";
+import GameDetails from "@/views/GameDetails.vue";
 
 const router = createRouter({
     history:createWebHistory(),
@@ -63,24 +62,20 @@ const router = createRouter({
             component:Recycling
         },
         {
-            path:'/ItemDetail',
-            component:ItemDetail
-        },
-        {
             path:'/ShoppingCart',
             component:ShoppingCart
         },
         {
-            path:'/SearchPage',
-            component:SearchPage
-        },
-        {
-            path:'/Test',
-            component:Test
-        },
-        {
             path:'/PromptPage',
             component:PromptPage
+        },
+        {
+            path:'/SearchGames',
+            component:SearchGames
+        },
+        {
+            path:'/GameDetails',
+            component:GameDetails
         },
 
         {

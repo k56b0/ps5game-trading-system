@@ -9,12 +9,12 @@ public class Game {
     private  String id;
     private  String englishName;
     private  String gameName;
-    private  String price;
-    private  String discount;
-    private  String inventory;
+    private  Integer price;
+    private  Float discount;
+    private  Integer inventory;
     private  String category;
-    private  String sales;
+    private  Integer sales;
     private  String introduction;
-    private  String year;
+    private  Integer year;
     private  String img;
 }

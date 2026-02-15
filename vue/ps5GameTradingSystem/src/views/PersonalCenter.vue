@@ -4,15 +4,12 @@ import {RouterView,RouterLink}from 'vue-router'
 </script>
 
 <template>
-  <div class="divContainer">
+  <div class="container-fluid">
 <!--    导航区-->
-    <div class="divItem Item1">
+    <div class=" Item1">
       <span class="text"><i class="bi bi-playstation"></i>  个人中心</span>
     </div>
-    <div class="divItem Item2">
-      <span class="text">我的信息</span>
-    </div>
-    <div class="divItem Item3">
+    <div class=" Item3">
       <br>
       <ul class="list-group custom-item ">
         <RouterLink to="/PersonalCenter/MyInfo"  class="list-group-item" active-class="active">我的信息</RouterLink>
@@ -22,7 +19,7 @@ import {RouterView,RouterLink}from 'vue-router'
         <RouterLink to="/PersonalCenter/MyWallet"  class="list-group-item" active-class="active">我的钱包</RouterLink>
       </ul>
     </div>
-    <div class="divItem Item4 ">
+    <div class=" Item4 ">
           <!--   展示区-->
           <RouterView></RouterView>
     </div>
@@ -32,12 +29,12 @@ import {RouterView,RouterLink}from 'vue-router'
 
 <style scoped>
 /*展示个人主页 盒子 grid布局*/
-.divContainer {
+.container-fluid {
   width: 100%;
   height:auto;
   position: relative;
   top: 10px;
-  left: 16%;
+  left: 14%;
   overflow: auto;
   /*transform: translate(-20%, -20%);*/
   /*justify-content: center;*/
@@ -49,7 +46,7 @@ import {RouterView,RouterLink}from 'vue-router'
   grid-template-rows: 40px 700px;
 
 }
-.divItem {
+.row {
   border: black 1px solid;
   border-radius: 2px;
   background-color: lightblue;
@@ -58,41 +55,21 @@ import {RouterView,RouterLink}from 'vue-router'
 }
 .Item1{
   grid-area: title1;
-}
-.Item2{
-  grid-area: title2;
+
 }
 .Item3{
   grid-area: list;
 }
 .Item4{
   grid-area: content;
+
 }
 
 /*设置文字样式*/
 .text{
   font-size: 20px;
 }
-
-/*设置导航区(Item3)*/
-.custom-item{
-  /*去掉列表旁边的小远点*/
-  list-style: none;
-  text-align: left;
-  /*border: black 1px solid;*/
-  /** 清除内外边距 **/
-  padding: 0;
-  margin-top:-25px;
-
-}
-.custom-item a{
-  /*去掉链接下面的下划线*/
-  text-decoration: none;
+a{
   color:#df5000;
 }
-
-
-
-
-
 </style>

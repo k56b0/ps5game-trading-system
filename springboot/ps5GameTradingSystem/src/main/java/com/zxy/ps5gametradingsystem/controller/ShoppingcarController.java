@@ -18,17 +18,18 @@ public class ShoppingcarController {
     private ShoppingcarService shoppingcarService;
     @Autowired
     private OrderController orderController;
-    //添加进购物车（增）
-    @PostMapping("/save")
-    public Result save (@RequestBody Shoppingcar s){
+    //添加进购物车（增） ,测试成功
+    @PostMapping("/add")
+    public Result add (@RequestBody Shoppingcar s){
         LambdaQueryWrapper<Shoppingcar> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Shoppingcar::getUserId, s.getUserId())
                 .eq(Shoppingcar::getGameName, s.getGameName());
-        if(shoppingcarService.getOne(queryWrapper) ==null){
+        Shoppingcar obj = shoppingcarService.getOne(queryWrapper);
+        if(obj == null){
             shoppingcarService.save(s);
             return Result.success();
         }else {
-            int temp = shoppingcarService.getOne(queryWrapper).getQuantity() + s.getQuantity();
+            int temp = obj.getQuantity() + s.getQuantity();
             // 假设有一个 UpdateWrapper 对象，
             // 设置更新条件为 user_id = s.getUserId()，game_name=s.getGameName()
             // 更新字段为quantity
@@ -44,15 +45,15 @@ public class ShoppingcarController {
             }
         }
     }
-    //删除购物车信息
-    @DeleteMapping("/{id}")
+    //删除购物车信息,测试成功
+    @DeleteMapping("/delete/{id}")
     public Result delete(@PathVariable String id){
         shoppingcarService.removeById(id);
         return  Result.success();
     }
-    //查询全部购物车 分页
-    @GetMapping("/{id}/{pageNum}")
-    public Result list (@PathVariable String id,@PathVariable Integer pageNum){
+    //查询全部购物车 分页,测试成功
+    @GetMapping("/queryAll/{id}/{pageNum}")
+    public Result queryAll (@PathVariable String id,@PathVariable Integer pageNum){
         int pageSize = 2;
         // 创建分页对象
         Page<Shoppingcar> page = new Page<>(pageNum, pageSize);
@@ -63,9 +64,9 @@ public class ShoppingcarController {
         Page<Shoppingcar> resultPage = shoppingcarService.page(page, queryWrapper);
         return Result.success(resultPage);
     }
-    //添加到订单
-    @PostMapping("/addOrder")
-    public Result addOrder (@RequestBody Order o) {
+    //从购物车添加到订单,测试成功
+    @PostMapping("/addToOrder")
+    public Result addToOrder (@RequestBody Order o) {
         orderController.addOrders(o);
         //删除购物车里的信息
         for(Order_details item :o.getOrderDetails()){

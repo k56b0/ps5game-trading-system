@@ -1,98 +1,110 @@
 <script  setup lang="ts">
 import { ref, reactive } from 'vue'
-import { inject } from 'vue';
-import type { AxiosInstance, AxiosResponse } from 'axios'
-import {useLoginStore} from '@/store/login.ts'
+import {useUserStore} from '@/store/userStore.ts'
+import {useOrderStore} from '@/store/orderStore.ts'
+import {useRecycleStore} from '@/store/recycleStore.ts'
+import {useRechargeRecordStore} from '@/store/rechargeRecordStore.ts'
+import {useFavoriteStore} from '@/store/favoriteStore.ts'
+import { v4 as uuidv4 } from 'uuid'
 
-const axios = inject('axios');
 // 使用响应式状态
 let isSignup = ref(false)
 
 // 表单数据
-const form = reactive({
+const formDate = reactive({
   email: '',
-  password: ''
+  password: '',
+  userName:'',
 })
-// 定义组件事件
-const emit = defineEmits(['login-success', 'login-error'])
-
-// 切换状态
+// user pinia
+const userStore =useUserStore()
+const orderStore=useOrderStore()
+const recycleStore =useRecycleStore()
+const rechargeRecordStore =useRechargeRecordStore()
+const useFavorite = useFavoriteStore()
+// 切换登陆状态
 function toggleSignup(){
   isSignup.value = !isSignup.value
-  console.log(isSignup.value)
 }
 
 //发送登陆请求
 async function handleLogin(){
   // 重置表单
   const resetForm = () => {
-    form.email = ''
-    form.password = ''
+    formDate.email = ''
+    formDate.password = ''
   }
   // 表单验证
-  if (!form.email.trim()) {
+  if (!formDate.email.trim()) {
     alert('请输入邮箱')
     return
   }
-
-  if (!form.password.trim()) {
+  if (!formDate.password.trim()) {
     alert('请输入密码')
     return
   }
-
   // 邮箱格式验证
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(form.email)) {
+  if (!emailRegex.test(formDate.email)) {
     alert('请输入有效的邮箱地址')
     return
   }
-  try {
-    // 使用POST请求，数据放在请求体中
-    const response = await (axios as AxiosInstance).post('/user/login', {
-      email: form.email.trim(),
-      passw: form.password
-    })
+  //联系后端，进行登陆验证，
+  await userStore.login({
+    email: formDate.email.trim(),
+    password: formDate.password
+  })
+  //查询用户订单
+  await orderStore.queryAll(
+      {
+        userId:userStore.myInfo.id,
+        pageNum:1
+      }
+  )
+  //查询用户回收记录
+  await recycleStore.queryAll(
+      {
+        userId:userStore.myInfo.id,
+        pageNum:1
+      }
+  )
+  //查询用户充值记录
+  await rechargeRecordStore.queryAll(
+      {
+        userId:userStore.myInfo.id,
+        pageNum:1
+      }
+  )
+  //查询收藏夹信息
+  await useFavorite.queryAll(
+      {
+        userId:userStore.myInfo.id,
+        pageNum:1
+      }
+  )
 
-    const result =  reactive(response.data)
-
-    if (result.code === 200) {
-      // 登录成功
-     let user = result.data
-      // // 保存用户信息到本地存储
-      // localStorage.setItem('user', JSON.stringify(user))
-      // 重置表单
-      resetForm()
-      alert('登录成功!')
-
-      console.log('登录成功:', user)
-      useLoginStore().isLoginMark=true
-      useLoginStore().myInfo=user
-
-    } else {
-      // 登录失败
-      const errorMsg = result.message || '登录失败，请检查邮箱和密码'
-      emit('login-error', errorMsg)
-      alert(errorMsg)
-    }
-  } catch (error) {
-    console.error('登录请求失败:', error)
-
-    let errorMessage = '登录失败，请稍后重试'
-
-    if ((error as any).response) {
-    emit('login-error', errorMessage)
-    alert(errorMessage)
-  }
-}
-
+  alert('登录成功!')
+  // 重置表单
+  resetForm()
 
 }
-// // 如果需要暴露方法给父组件
-// defineExpose({
-//   handleLogin
-// })
+//获取 UUID
+const uuid = ref('');
+const generateNewUUID = () => {
+  uuid.value = uuidv4();
+};
 
-
+async function handleRegister(){
+  generateNewUUID()
+  await userStore.register(
+      {
+        id:uuid.value,
+        userName:formDate.userName,
+        email: formDate.email.trim(),
+        password: formDate.password
+      }
+  )
+}
 </script>
 <template>
 <!--  使用响应式状态控制类名-->
@@ -105,11 +117,11 @@ async function handleLogin(){
         <h2>欢迎回来</h2>
         <label>
           <span>邮箱</span>
-          <input v-model="form.email" type="email" />
+          <input v-model="formDate.email" type="email" />
         </label>
         <label>
           <span>密码</span>
-          <input v-model="form.password" type="password" />
+          <input v-model="formDate.password" type="password" />
         </label>
         <p class="forgot-pass"><a href="javascript:">忘记密码？</a></p>
         <button type="submit" class="submit">登 录</button>
@@ -134,20 +146,20 @@ async function handleLogin(){
       </div>
       <div class="form sign-up">
         <h2>立即注册</h2>
-        <form action="#" method="post">
+        <form @submit.prevent="handleRegister">
           <label>
             <span>用户名</span>
-            <input type="text" />
+            <input type="text" v-model="formDate.userName"/>
           </label>
           <label>
             <span>邮箱</span>
-            <input type="email" />
+            <input type="email" v-model="formDate.email" />
           </label>
           <label>
             <span>密码</span>
-            <input type="password" />
+            <input type="password"  v-model="formDate.password"/>
           </label>
-          <button type="button" class="submit">注 册</button>
+          <button type="submit" class="submit">注 册</button>
         </form>
         <button type="button" class="fb-btn">暂 不 注 册</button>
       </div>

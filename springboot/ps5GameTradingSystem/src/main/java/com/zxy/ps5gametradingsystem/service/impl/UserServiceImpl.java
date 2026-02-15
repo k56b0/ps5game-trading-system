@@ -15,14 +15,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(User::getEmail, email);
         User user = this.getOne(queryWrapper); // 假设邮箱是唯一的
-
         // 2. 如果用户不存在，返回null
         if (user == null) {
             return null;
         }
         // 3. 比较密码
         if (password.equals(user.getPassword())) {
-            // 4. 密码正确，返回用户（注意：这里返回的是整个用户实体，包括密码，后面需要去掉密码）
+            // 4. 密码正确，返回用户
             return user;
         }
         // 5. 密码错误，返回null
@@ -39,7 +38,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public boolean register(User user) {
-         //根据邮箱查询现有用户
+         //1.根据邮箱查询现有用户
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(User::getEmail, user.getEmail());
         //2.如果邮箱不重复,就更新用户信息，并返回true

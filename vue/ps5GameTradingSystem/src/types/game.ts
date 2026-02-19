@@ -8,7 +8,7 @@ export interface game{
     category:string
     sales:number,
     introduction:string,
-    year:number,
+    year:string,
     img:string,
 }
 export type games=game[]

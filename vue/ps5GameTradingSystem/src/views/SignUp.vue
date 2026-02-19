@@ -5,6 +5,7 @@ import {useOrderStore} from '@/store/orderStore.ts'
 import {useRecycleStore} from '@/store/recycleStore.ts'
 import {useRechargeRecordStore} from '@/store/rechargeRecordStore.ts'
 import {useFavoriteStore} from '@/store/favoriteStore.ts'
+import {useShoppingCarStore} from '@/store/shoppingCarStore.ts'
 import { v4 as uuidv4 } from 'uuid'
 
 // 使用响应式状态
@@ -22,6 +23,7 @@ const orderStore=useOrderStore()
 const recycleStore =useRecycleStore()
 const rechargeRecordStore =useRechargeRecordStore()
 const useFavorite = useFavoriteStore()
+const useShoppingCar = useShoppingCarStore()
 // 切换登陆状态
 function toggleSignup(){
   isSignup.value = !isSignup.value
@@ -77,6 +79,13 @@ async function handleLogin(){
   )
   //查询收藏夹信息
   await useFavorite.queryAll(
+      {
+        userId:userStore.myInfo.id,
+        pageNum:1
+      }
+  )
+  //查询购物车信息
+  await useShoppingCar.queryAll(
       {
         userId:userStore.myInfo.id,
         pageNum:1

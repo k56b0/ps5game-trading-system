@@ -1,10 +1,70 @@
 <script setup lang="ts">
 import {useGameStore} from '@/store/gameStore.ts'
+import {useFavoriteStore} from '@/store/favoriteStore.ts'
+import {useShoppingCarStore} from '@/store/shoppingCarStore.ts'
+import {useUserStore} from '@/store/userStore.ts'
+import { v4 as uuidv4 } from 'uuid'
+import {ref} from "vue";
 import {storeToRefs} from "pinia";
+import {useRouter } from 'vue-router'
 
+const router = useRouter()
 // 使用 pinia
+const userStore =useUserStore()
 const useGame =useGameStore()
+const useFavorite = useFavoriteStore()
+const useShoppingCar = useShoppingCarStore()
 const { GameOneShow,discountedPrice} = storeToRefs(useGame);
+const { myInfo} = storeToRefs(userStore);
+const goBack = () => {
+  // 返回上一页，如果上一页不存在则默认回到首页（可选）
+  if (window.history.state?.back) {
+    router.back()
+  } else {
+    router.push('/') // 或者你想去的默认页面
+  }
+}
+//获取 UUID
+const uuid = ref('');
+const generateNewUUID = () => {
+  uuid.value = uuidv4();
+};
+async function addFavorites(){
+  generateNewUUID()
+  await useFavorite.add(
+      {
+        id:uuid.value,
+        userId:myInfo.value.id,
+        gameName:GameOneShow.value.gameName,
+      }
+  )
+  //查询收藏夹信息
+  await useFavorite.queryAll(
+      {
+        userId:myInfo.value.id,
+        pageNum:1
+      }
+  )
+}
+async function addShoppingCar(){
+  generateNewUUID()
+  await useShoppingCar.add(
+      {
+        id:uuid.value,
+        userId:myInfo.value.id,
+        price:discountedPrice.value ,
+        gameName:GameOneShow.value.gameName,
+        quantity:1
+      }
+  )
+  //查询收藏夹信息
+  await useShoppingCar.queryAll(
+      {
+        userId:myInfo.value.id,
+        pageNum:1
+      }
+  )
+}
 </script>
 
 <template>
@@ -57,13 +117,13 @@ const { GameOneShow,discountedPrice} = storeToRefs(useGame);
 
 
           <div class="btn-group">
-            <button class="btn btn-primary">
+            <button class="btn btn-primary" @click="addFavorites">
               <i class="far fa-heart"></i> 添加到收藏夹
             </button>
-            <button class="btn btn-success">
-              <i class="fas fa-shopping-cart"></i> 添加到购物车
+            <button class="btn btn-success" @click="addShoppingCar">
+              <i class="fas fa-shopping-cart"  ></i> 添加到购物车
             </button>
-            <button class="btn btn-warning">
+            <button class="btn btn-warning" @click="goBack">
               <i class="fas fa-shopping-cart"></i> 返回
             </button>
           </div>

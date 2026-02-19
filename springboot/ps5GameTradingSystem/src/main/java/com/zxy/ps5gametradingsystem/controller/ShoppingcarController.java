@@ -39,6 +39,7 @@ public class ShoppingcarController {
                     set("quantity", temp);
             boolean result = shoppingcarService.update(updateWrapper); // 调用 update 方法
             if (result) {
+
                 return Result.success();
             } else {
                 return Result.error();
@@ -54,7 +55,7 @@ public class ShoppingcarController {
     //查询全部购物车 分页,测试成功
     @GetMapping("/queryAll/{id}/{pageNum}")
     public Result queryAll (@PathVariable String id,@PathVariable Integer pageNum){
-        int pageSize = 2;
+        int pageSize = 5;
         // 创建分页对象
         Page<Shoppingcar> page = new Page<>(pageNum, pageSize);
         // 构建查询条件

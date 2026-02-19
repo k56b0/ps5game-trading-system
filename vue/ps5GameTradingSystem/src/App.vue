@@ -13,8 +13,7 @@
               <RouterLink to="/Home" class="nav-link" active-class="active">首页</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink v-if="isLoginMark" to="/Recycling" class="nav-link" active-class="active">二手回收</RouterLink>
-              <RouterLink v-else to="/PromptPage" class="nav-link" active-class="active">二手回收</RouterLink>
+              <RouterLink  to="/Recycling" class="nav-link" active-class="active">二手回收</RouterLink>
             </li>
             <li class="nav-item">
               <RouterLink v-if="isLoginMark" to="/PersonalCenter/MyInfo" class="nav-link" active-class="active">个人中心</RouterLink>
@@ -37,10 +36,10 @@
           </ul>
           <div class="shoppingCart">
             <RouterLink v-if="isLoginMark" to="/ShoppingCart" class="nav-link" >
-              <i class="bi bi-cart"></i>购物车( 0 )
+              <i class="bi bi-cart"></i>购物车( {{shoppingCarQuantity}} )
             </RouterLink>
             <RouterLink v-else to="/PromptPage" class="nav-link" >
-              <i class="bi bi-cart"></i>购物车( 0 )
+              <i class="bi bi-cart"></i>购物车( {{shoppingCarQuantity}} )
             </RouterLink>
           </div>
         </div>
@@ -79,17 +78,17 @@
 <script setup lang="ts">
 // 引入 routerView,让路由器知道，把 视图放在哪里
 import {RouterView,RouterLink}from 'vue-router'
-import {ref} from 'vue'
 import {useUserStore} from '@/store/userStore.ts'
 /* 引入storeToRefs */
 import { storeToRefs } from 'pinia'
-
+import {useShoppingCarStore} from '@/store/shoppingCarStore.ts'
+const useShoppingCar = useShoppingCarStore()
 // 默认 没有登陆
 // let isLoginMark = ref(false)
 /* 使用storeToRefs转换useLoginStore()，随后解构 */
 const {isLoginMark} = storeToRefs(useUserStore())
+const {shoppingCarQuantity} = storeToRefs(useShoppingCar)
 const {myInfo:{value:temp}} = storeToRefs(useUserStore())
-
 function userCheckIn() {
   temp.checkIn +=1
 }

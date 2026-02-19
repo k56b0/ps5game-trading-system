@@ -10,16 +10,10 @@ export const useFavoriteStore = defineStore('favoriteStore', {
         async queryAll(data: { userId: string; pageNum: number }) {
             try {
                 // 根据实际 baseURL 调整路径
-                /**
-                 * 你用了单引号或双引号包裹字符串，而不是反引号（模板字符串标识符）。
-                 * 错误写法：'/recycle/queryAll/${id}/${pageNum}'
-                 * 正确写法：`/recycle/queryAll/${id}/${pageNum}`
-                 */
                 const response = await httpAxios.get(`/favorites/queryAll/${data.userId}/${data.pageNum}`);
                 const result = response.data;
 
                 if (result.code === 200) {
-                    console.log('查询成功', result.data);
                     // 将records存入响应式变量
                     this.myFavorites = result.data.records
                     //存入翻页信息 直接赋值给 state 属性，Pinia 会自动处理响应性

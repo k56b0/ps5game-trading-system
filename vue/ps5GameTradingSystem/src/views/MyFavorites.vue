@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import {  computed } from 'vue'
+import {computed, ref} from 'vue'
 import PageTurning from "@/components/PageTurning.vue";
 import {useUserStore} from '@/store/userStore.ts'
 import {useFavoriteStore} from '@/store/favoriteStore.ts'
 import {useGameStore} from '@/store/gameStore.ts'
 import { useRouter } from 'vue-router'
 import {storeToRefs} from "pinia";
+import { v4 as uuidv4 } from 'uuid'
 
 const router = useRouter()
 const useUser = useUserStore()
@@ -14,6 +15,8 @@ const useGame =useGameStore()
 const {myFavoritesMap,current, pages}=storeToRefs(useFavorite)
 const {myInfo}=storeToRefs(useUser)
 
+// 响应式数据
+const hoverOrderId = ref(null);
 /*选择服务 开始*/
 // 1.计算属性：已选中数量
 const selectedCount = computed(() => {
@@ -87,7 +90,7 @@ const handlePageChange = (newPage:number) => {
 async function showDetail(gameName:string) {
   try {
     // 1. 先查询游戏详情（等待完成）
-    await useGame.queryByName(gameName)
+    await useGame.queryByName(gameName,false)
     // 2. 查询成功后跳转到详情页
     // 方式一：通过 query 传递参数（适用于任何路由配置）
     // router.push({ path: '/GameDetails', query: { name: gameName } })
@@ -100,6 +103,31 @@ async function showDetail(gameName:string) {
     // 可在此处处理错误，例如提示用户
   }
 }
+//获取 UUID
+const uuid = ref('');
+const generateNewUUID = () => {
+  uuid.value = uuidv4();
+};
+// async function addShoppingCar(gameName:string) {
+//   generateNewUUID()
+//   await useShoppingCar.add(
+//       {
+//         id:uuid.value,
+//         userId:myInfo.value.id,
+//         //price这里是一个技术点，待修正
+//         price:1111111111,
+//         gameName:gameName,
+//         quantity:1
+//       }
+//   )
+//   //查询收藏夹信息
+//   await useShoppingCar.queryAll(
+//       {
+//         userId:myInfo.value.id,
+//         pageNum:1
+//       }
+//   )
+// }
 </script>
 
 <template>
@@ -134,7 +162,11 @@ async function showDetail(gameName:string) {
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(game, index) in myFavoritesMap" :key="game.id">
+        <tr v-for="(game, index) in myFavoritesMap" :key="game.id"
+            @mouseenter="(hoverOrderId as any)= game.id"
+            @mouseleave="hoverOrderId = null"
+            :class="{ 'hover-active': hoverOrderId === game.id }"
+        >
           <td class="align-middle text-center">
             <!-- 使用 v-model 双向绑定每一行的选中状态 -->
             <input
@@ -148,9 +180,10 @@ async function showDetail(gameName:string) {
 
           <td class="align-middle text-center">{{game.gameName}}</td>
           <td  class="align-middle text-center">
-            <div class="table-actions">
-              <button class="btn btn-sm btn-outline-primary me-1" title="添加到购物车" >
-                <i class="bi bi-gift-fill"></i></button>
+            <div class="table-actions"
+                 :style="{ opacity: hoverOrderId === game.id ? '1' : '0' }">
+<!--              <button class="btn btn-sm btn-outline-primary me-1" @click="addShoppingCar(game.gameName)" title="添加到购物车" >-->
+<!--                <i class="bi bi-gift-fill"></i></button>-->
               <button class="btn btn-sm btn-outline-primary me-1" title="查看" @click="showDetail(game.gameName)">
                 <i class="bi bi-eye"></i></button>
               <button class="btn btn-sm btn-outline-danger" title="删除" @click="deleteOne(game.id)">
@@ -185,6 +218,9 @@ async function showDetail(gameName:string) {
 /* 给操作列的按钮组一点右间距，更透气 */
 .table-actions {
   white-space: nowrap;
+}
+.table-hover-custom tbody tr.hover-active {
+  background-color: rgba(0, 123, 255, 0.05);
 }
 
 </style>

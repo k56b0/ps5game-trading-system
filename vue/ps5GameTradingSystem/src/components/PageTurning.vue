@@ -102,4 +102,9 @@ const middlePages = computed<(number | string)[]>(() => {
   justify-content: center;
   margin: 15px 0;
 }
+.pagination .page-link {
+  width: 60px;          /* 你想要的具体宽度 */
+  text-align: center;
+  padding: 0.375rem 0;  /* 适当调整上下内边距，左右内边距被宽度限制 */
+}
 </style>

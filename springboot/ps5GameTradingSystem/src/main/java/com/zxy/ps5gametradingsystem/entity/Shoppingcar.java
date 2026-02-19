@@ -10,4 +10,5 @@ public class Shoppingcar {
     private  String userId;
     private  String gameName;
     private  Integer quantity;
+    private  Float price;
 }

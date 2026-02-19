@@ -27,11 +27,6 @@ public class UserController {
     //用户保存用户信息
     @PostMapping("/update")
     public Result update (@RequestBody User request){
-        System.out.println("接收到的用户对象：" + request);  // 确保 toString() 完整打印所有字段
-        System.out.println("ID: " + request.getId());
-        System.out.println("userName: " + request.getUserName());
-        System.out.println("checkIn: " + request.getCheckIn());
-        System.out.println("address: " + request.getAddress());
         User updateData = userService.update(request);
         if( updateData !=null){
             //保存成功

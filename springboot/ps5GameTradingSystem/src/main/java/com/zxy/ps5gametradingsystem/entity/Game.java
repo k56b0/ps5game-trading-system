@@ -3,6 +3,8 @@ package com.zxy.ps5gametradingsystem.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 @TableName("`game`")
 public class Game {
@@ -15,6 +17,6 @@ public class Game {
     private  String category;
     private  Integer sales;
     private  String introduction;
-    private  Integer year;
+    private  String year;
     private  String img;
 }

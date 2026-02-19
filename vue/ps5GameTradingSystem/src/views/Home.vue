@@ -1,6 +1,32 @@
 <script setup lang="ts">
 import ShowGoods from "@/components/ShowGoods.vue";
+import {useRouter} from 'vue-router'
+import {ref} from "vue";
+const router = useRouter()
+let searchText = ref('')
+function searchByName() {
+  router.push(
+      {
+        path:'/SearchGames',
+        query:{
+          searchText:searchText.value
+        }
+      }
+  ) // 或者你想去的默认页面
+}
+const list=["角色扮演","射击","动作","体育","竞速","恐怖","经营","联机","开放世界"
+]
 
+function searchByCategory(categoryText:string) {
+  router.push(
+      {
+        path:'/SearchGames',
+        query:{
+          categoryText:categoryText
+        }
+      }
+  ) // 或者你想去的默认页面
+}
 </script>
 
 <template>
@@ -14,20 +40,17 @@ import ShowGoods from "@/components/ShowGoods.vue";
         <div class="collapse navbar-collapse custom-collapse " >
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link active" href="#">新品上市</a>
+              <a class="nav-link" href="#section1">新品上市</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">即将推出</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">热销商品</a>
+              <a class="nav-link" href="#section2">即将推出</a>
             </li>
           </ul>
         </div>
         <div class="collapse navbar-collapse"  >
           <div class="search">
-            <input type="search">
-            <button type="submit" >
+            <input type="search" v-model="searchText" placeholder="按照游戏名搜索">
+            <button type="submit" @click="searchByName">
               <i  class="bi bi-search"></i>
             </button>
           </div>
@@ -39,15 +62,8 @@ import ShowGoods from "@/components/ShowGoods.vue";
       <!-- 左侧菜单 -->
       <div class="side-menu">
         <ul>
-          <li><a href="#">策略</a><span>></span></li>
-          <li><a href="#">角色扮演</a><span>></span></li>
-          <li><a href="#">休闲 养成</a><span>></span></li>
-          <li><a href="#">竞速</a><span>></span></li>
-          <li><a href="#">开放世界</a><span>></span></li>
-          <li><a href="#">射击</a><span>></span></li>
-          <li><a href="#">恐怖游戏</a><span>></span></li>
-          <li><a href="#">动作 体育</a><span>></span></li>
-          <li><a href="#">多人联机</a><span>></span></li>
+          <li v-for="(item) in list" :key="item" @click="searchByCategory(item)">
+            <a class="add">{{item}}</a><span>></span></li>
         </ul>
       </div>
 
@@ -97,9 +113,9 @@ import ShowGoods from "@/components/ShowGoods.vue";
     </div>
     <!--  展示区-->
     <div class="panel-body align-items-center">
-        <ShowGoods></ShowGoods>
-        <ShowGoods></ShowGoods>
-        <ShowGoods></ShowGoods>
+        <ShowGoods title="热销商品"></ShowGoods>
+        <ShowGoods title="新品上市" id="section1"></ShowGoods>
+        <ShowGoods title="即将推出" id="section2"></ShowGoods>
     </div>
   </div>
 <!--  底部背景广告位-->
@@ -175,7 +191,7 @@ import ShowGoods from "@/components/ShowGoods.vue";
   margin: 10px;
   margin-right: 10%;
 }
-.search input[type="submit"]:hover {
+.search button[type="submit"]:hover {
   background-color: #ff6700;
   border-color: #ff6700;
   color: #fff;
@@ -434,6 +450,9 @@ import ShowGoods from "@/components/ShowGoods.vue";
 .about .survey .contact span:hover {
   background-color: #ff6700;
   color: #fff;
+}
+.add:hover{
+  color: #0d6efd;
 }
 
 </style>

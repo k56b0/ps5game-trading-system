@@ -1,5 +1,48 @@
 <script setup lang="ts">
 import {RouterLink}from 'vue-router'
+import {useGameStore} from '@/store/gameStore.ts'
+import {useRouter} from "vue-router";
+import {computed, onMounted, ref} from "vue";
+import {storeToRefs} from "pinia";
+const { title }=defineProps(['title'])
+const router = useRouter()
+const useGame = useGameStore()
+
+const {PushPageGames1,PushPageGames2,PushPageGames3}=storeToRefs(useGame)
+
+const PushPageGames = computed(() => {
+  switch (title) {
+    case '热销商品': return PushPageGames1.value
+    case '新品上市': return PushPageGames2.value
+    default: return PushPageGames3.value
+  }
+})
+
+onMounted(() => {
+  useGame.queryPushPage(title)
+})
+//计算折扣价——既读取又修改
+function computedPrice(val1:number,val2:number){
+  return (val1*val2).toFixed(0)
+}
+
+//查询游戏详情
+async function showDetail(gameName:string) {
+  try {
+    // 1. 先查询游戏详情（等待完成）
+    await useGame.queryByName(gameName)
+    // 2. 查询成功后跳转到详情页
+    // 方式一：通过 query 传递参数（适用于任何路由配置）
+    // router.push({ path: '/GameDetails', query: { name: gameName } })
+    // 方式二：如果路由配置了动态参数（如 /GameDetails/:gameName），可以使用 params
+    // router.push({ name: 'GameDetails', params: { gameName } })
+    // 方式三：如果不需要参数，直接跳转
+    router.push('/GameDetails')
+  } catch (error) {
+    console.error('查询游戏详情失败', error)
+    // 可在此处处理错误，例如提示用户
+  }
+}
 </script>
 
 <template>
@@ -7,7 +50,7 @@ import {RouterLink}from 'vue-router'
   <div class="container">
     <div class="row">
       <div class="col col-md-10 align-self-start">
-        热销商品
+        {{title}}
       </div>
       <div class="col align-self-end">
         <RouterLink to="/SearchGames"  class="nav-link" >
@@ -16,38 +59,15 @@ import {RouterLink}from 'vue-router'
       </div>
     </div>
     <ul>
-      <li>
-        <div><img src="@/assets/images/游戏封面图/双影奇境-1.jpg" alt=""></div>
+      <li v-for="(game) in PushPageGames  ">
+        <div><img :src="game.img" alt="" @click="showDetail(game.gameName)"></div>
         <div class="description">
-          <h3>双影奇境</h3>
-          <p>多人</p>
-          <h4>139元</h4>
+          <h3>{{game.gameName}}</h3>
+          <p>{{game.category}}</p>
+          <h4>{{computedPrice(game.price,game.discount)}}元</h4>
         </div>
       </li>
-      <li>
-        <div><img src="@/assets/images/游戏封面图/天国拯救2-1.jpg" alt=""></div>
-        <div class="description">
-          <h3>天国：拯救2</h3>
-          <p>角色扮演</p>
-          <h4>228元</h4>
-        </div>
-      </li>
-      <li>
-        <div><img src="@/assets/images/游戏封面图/最终幻想7重制版-1.jpg" alt=""></div>
-        <div class="description">
-          <h3>最终幻想7重制版</h3>
-          <p>角色扮演</p>
-          <h4>98元</h4>
-        </div>
-      </li>
-      <li>
-        <div><img src="@/assets/images/游戏封面图/真三国无双起源-1.jpeg" alt=""></div>
-        <div class="description">
-          <h3>真三国无双起源</h3>
-          <p>动作</p>
-          <h4>349元</h4>
-        </div>
-      </li>
+
 
     </ul>
   </div>
@@ -85,7 +105,7 @@ import {RouterLink}from 'vue-router'
 .container ul li img {
   width: 160px;
   margin: 0 auto 10px;
-  height: 100px;
+  height: 140px;
   cursor: pointer;
 }
 

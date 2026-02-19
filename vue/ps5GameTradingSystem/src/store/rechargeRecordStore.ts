@@ -19,7 +19,6 @@ export const useRechargeRecordStore = defineStore('rechargeRecordStore', {
                 const result = response.data;
 
                 if (result.code === 200) {
-                    console.log('查询成功', result.data);
                     // 将records存入响应式变量
                     this.myRechargeRecords = result.data.records
                     //存入翻页信息 直接赋值给 state 属性，Pinia 会自动处理响应性

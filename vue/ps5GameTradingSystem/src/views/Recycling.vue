@@ -1,113 +1,158 @@
 <script setup lang="ts">
+import { useRecycleStore} from '@/store/recycleStore.ts'
+import {useUserStore} from '@/store/userStore.ts'
+import type {recycle} from '@/types/recycle.ts'
+import {storeToRefs} from "pinia";
+import {computed, onMounted, ref} from "vue";
+import { v4 as uuidv4 } from 'uuid'
 
+
+const useRecycle = useRecycleStore()
+const useUser = useUserStore()
+
+const {myInfo}=storeToRefs(useUser)
+const {newRecycle}=storeToRefs(useRecycle)
+
+const gameName = ref('')
+const version = ref('')
+const language = ref('')
+const appearance = ref('')
+const box = ref('')
+
+const formattedValuation = computed(() => {
+  const val = newRecycle.value.valuation // 可能为 undefined
+  return val != null ? val.toFixed(2) : '0.00';
+});
+//获取 UUID
+const uuid = ref('');
+const generateNewUUID = () => {
+  uuid.value = uuidv4();
+};
+onMounted(() => {
+  generateNewUUID()
+})
+// 重置回收单
+const reset = () => {
+  newRecycle.value={} as recycle
+  gameName.value = ''
+  version.value = ''
+  language.value = ''
+  appearance.value = ''
+  box.value = ''
+}
+async function handleAdd(){
+  if(newRecycle.value.valuation ==null){
+    const data: recycle = {
+      id: uuid.value, // 或临时ID
+      userId: myInfo.value.id,
+      gameName: gameName.value,
+      valuation: newRecycle.value.valuation, // 可能需要在提交后由后端计算，暂时留空
+      recyclingStatus: '回收完毕', // 初始状态
+      version: version.value === 'guohang' ? '国行' : '非国行',
+      language: language.value === 'ChineseSupport' ? '支持中文' : '不支持中文',
+      appearance: appearance.value=== 'appearanceA' ? '光盘无划痕' : appearance.value === 'appearanceB' ? '光盘轻微划痕' : '光盘严重划痕',
+      box: box.value === 'boxGood' ? '包装盒彩页齐全完好' : box.value === 'boxDamaged' ? '包装盒彩页齐全损坏' : '无包装盒',
+    }
+    await useRecycle.add(data)
+  }else{
+    await useRecycle.add(newRecycle.value)
+    reset()
+    alert("回收成功")
+  }
+
+  //查询用户回收记录
+  await useRecycle.queryAll(
+      {
+        userId:useUser.myInfo.id,
+        pageNum:1
+      }
+  )
+}
 </script>
 
 <template>
   <div class="container-fluid">
-    <div class="row">
+    <div class="row justify-content-center">
       <h1>回收评估</h1>
       <h3>寄售商品将经过专业质检，请如实选择商品选项</h3>
     </div>
-    <div class="row">
+    <div class="row justify-content-center">
       <div class="col-sm-4 center-col">
-        <form action="#" method="post" target="_blank">
-          <!-- 游戏名-->
-          <label class="labelTitle"   >0.游戏名</label>
-
+        <form @submit.prevent="handleAdd">
+          <!-- 游戏名 -->
+          <label class="labelTitle">0.游戏名</label>
           <label>
-            <input type="text" name="gameName" value="" placeholder="请输入游戏名">
+            <input type="text" v-model="gameName" placeholder="请输入游戏名">
           </label>
           <br>
 
           <!-- 1.版本选择 -->
           <label class="labelTitle">1.版本</label>
           <label class="radio-container">
-            <input type="radio" name="guoHang" value="guohangF" class="radio-input">
-            <span class="radio-custom">
-            <span class="radio-text">非国行</span> <!-- 框内文字 -->
-        </span>
+            <input type="radio" v-model="version" value="guohangF" class="radio-input">
+            <span class="radio-custom"><span class="radio-text">非国行</span></span>
+          </label>
+          <label class="radio-container">
+            <input type="radio" v-model="version" value="guohang" class="radio-input">
+            <span class="radio-custom"><span class="radio-text">国行</span></span>
           </label>
 
-          <label class="radio-container">
-            <input type="radio" name="guoHang" value="guohang" class="radio-input">
-            <span class="radio-custom">
-            <span class="radio-text">国行</span> <!-- 框内文字 -->
-        </span>
-          </label>
           <!-- 2.语言选择 -->
           <label class="labelTitle">2.语言</label>
           <label class="radio-container">
-            <input type="radio" name="ChineseSupport" value="ChineseSupport" class="radio-input">
-            <span class="radio-custom">
-            <span class="radio-text">支持中文</span> <!-- 框内文字 -->
-        </span>
+            <input type="radio" v-model="language" value="ChineseSupport" class="radio-input">
+            <span class="radio-custom"><span class="radio-text">支持中文</span></span>
           </label>
           <label class="radio-container">
-            <input type="radio" name="ChineseSupport" value="ChineseSupportF" class="radio-input">
-            <span class="radio-custom">
-            <span class="radio-text">不支持中文</span> <!-- 框内文字 -->
-        </span>
+            <input type="radio" v-model="language" value="ChineseSupportF" class="radio-input">
+            <span class="radio-custom"><span class="radio-text">不支持中文</span></span>
           </label>
+
           <!-- 3.外观呈色 -->
           <label class="labelTitle">3.外观呈色</label>
           <label class="radio-container">
-            <input type="radio" name="appearance" value="appearanceA" class="radio-input">
-            <span class="radio-custom">
-            <span class="radio-text">光盘无划痕</span> <!-- 框内文字 -->
-        </span>
+            <input type="radio" v-model="appearance" value="appearanceA" class="radio-input">
+            <span class="radio-custom"><span class="radio-text">光盘无划痕</span></span>
           </label>
           <label class="radio-container">
-            <input type="radio" name="appearance" value="appearanceB" class="radio-input">
-            <span class="radio-custom">
-            <span class="radio-text">光盘轻微划痕</span> <!-- 框内文字 -->
-        </span>
+            <input type="radio" v-model="appearance" value="appearanceB" class="radio-input">
+            <span class="radio-custom"><span class="radio-text">光盘轻微划痕</span></span>
           </label>
           <label class="radio-container">
-            <input type="radio" name="appearance" value="appearanceC" class="radio-input">
-            <span class="radio-custom">
-            <span class="radio-text">光盘严重划痕</span> <!-- 框内文字 -->
-        </span>
+            <input type="radio" v-model="appearance" value="appearanceC" class="radio-input">
+            <span class="radio-custom"><span class="radio-text">光盘严重划痕</span></span>
           </label>
 
-          <!-- 4.包装盒 -->
+          <!-- 4.包装盒（注意 value 必须唯一） -->
           <label class="labelTitle">4.包装盒</label>
           <label class="radio-container">
-            <input type="radio" name="packagingBox" value="packagingBoxA" class="radio-input">
-            <span class="radio-custom">
-            <span class="radio-text">包装盒彩页齐全完好</span> <!-- 框内文字 -->
-        </span>
+            <input type="radio" v-model="box" value="boxGood" class="radio-input">
+            <span class="radio-custom"><span class="radio-text">包装盒彩页齐全完好</span></span>
           </label>
           <label class="radio-container">
-            <input type="radio" name="packagingBox" value="packagingBoxA" class="radio-input">
-            <span class="radio-custom">
-            <span class="radio-text">包装盒彩页齐全损坏</span> <!-- 框内文字 -->
-        </span>
+            <input type="radio" v-model="box" value="boxDamaged" class="radio-input">
+            <span class="radio-custom"><span class="radio-text">包装盒彩页齐全损坏</span></span>
           </label>
           <label class="radio-container">
-            <input type="radio" name="packagingBox" value="packagingBoxB" class="radio-input">
-            <span class="radio-custom">
-            <span class="radio-text">包装盒彩页齐全完好</span> <!-- 框内文字 -->
-        </span>
-          </label>
-          <label class="radio-container">
-            <input type="radio" name="packagingBox" value="packagingBoxC" class="radio-input">
-            <span class="radio-custom">
-                    <span class="radio-text">无包装盒</span> <!-- 框内文字 -->
-                 </span>
+            <input type="radio" v-model="box" value="boxNone" class="radio-input">
+            <span class="radio-custom"><span class="radio-text">无包装盒</span></span>
           </label>
           <input type="submit" value="提交">
-
         </form>
       </div>
       <div class="col-sm-4 side-col">
-        <div class="labelTitle">评估的游戏名： <span class="labelContent">XXX</span></div>
-        <div class="labelTitle">版本： <span class="labelContent">国行</span></div>
-        <div class="labelTitle">语言： <span class="labelContent">支持中文</span></div>
-        <div class="labelTitle">外观呈色： <span class="labelContent">光盘无划痕</span></div>
-        <div class="labelTitle">包装盒： <span class="labelContent">无包装盒</span></div>
-        <div class="labelTitle">线上评估的价格： <span class="labelContent">200 元</span></div>
+        <div class="labelTitle">评估的游戏名： <span class="labelContent">{{ gameName }}</span></div>
+        <div class="labelTitle">版本： <span class="labelContent">{{ version === 'guohang' ? '国行' : '非国行' }}</span></div>
+        <div class="labelTitle">语言： <span class="labelContent">{{ language === 'ChineseSupport' ? '支持中文' : '不支持中文' }}</span></div>
+        <div class="labelTitle">外观呈色： <span class="labelContent">
+  {{ appearance === 'appearanceA' ? '光盘无划痕' : appearance === 'appearanceB' ? '光盘轻微划痕' : '光盘严重划痕' }}
+</span></div>
+        <div class="labelTitle">包装盒： <span class="labelContent">
+  {{ box === 'boxGood' ? '包装盒彩页齐全完好' : box === 'boxDamaged' ? '包装盒彩页齐全损坏' : '无包装盒' }}
+</span></div>
+        <div class="labelTitle">线上评估的价格： <span class="labelContent">{{formattedValuation}} 元</span></div>
         <div>
-          <button>确认回收</button>
+          <button @click="handleAdd">确认回收</button>
         </div>
       </div>
 
@@ -118,7 +163,7 @@
 
 <style scoped>
 .container-fluid{
-  margin-left: 300px;
+
 }
 .center-col{
   border: #4e7c46 1px solid;
@@ -200,6 +245,9 @@ input[type="submit"],button {
   font-size: 15px;
   cursor: pointer;
   border: solid black 1px;
+}
+h1,h3{
+  margin-left: 300px;
 }
 
 </style>

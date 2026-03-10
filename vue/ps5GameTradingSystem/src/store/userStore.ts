@@ -60,12 +60,30 @@ export const useUserStore = defineStore('userStore',{
             }catch (error) {
                 console.error('更新失败:', error)
             }
+        },
+        async findPassword(data:any){
+            try {
+                const response = await httpAxios.post('/user/findPassword',data)
+                //取出response.data，即后端的 Result 对象，并且做成响应式
+                const result =  response.data
+                if (result.code === 200) {
+                    this.errorMsg = '修改密码成功'
+                    console.log("success")
+
+                }else{
+                    this.errorMsg = result.message
+                    console.log(this.errorMsg)
+                }
+            }catch (error) {
+                console.error('更新失败:', error)
+            }
         }
     },
     // 状态
     state(){
         return {
             isLoginMark:false,
+            errorMsg:'',
             myInfo:reactive<user>({
                 id:'',
                 userName:'',

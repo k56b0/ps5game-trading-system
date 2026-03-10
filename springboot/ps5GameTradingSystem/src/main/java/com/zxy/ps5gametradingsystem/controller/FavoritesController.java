@@ -39,7 +39,7 @@ public class FavoritesController {
     //查询用户全部收藏夹信息 分页
     @GetMapping("/queryAll/{id}/{pageNum}")
     public Result queryAll(@PathVariable String id, @PathVariable Integer pageNum){
-        int pageSize = 4;
+        int pageSize = 5;
         // 创建分页对象
         Page<Favorites> page = new Page<>(pageNum, pageSize);
         // 构建查询条件

@@ -6,6 +6,9 @@ import {computed, onMounted, onUnmounted, ref} from "vue"
 import {storeToRefs} from "pinia"
 import { v4 as uuidv4 } from 'uuid'
 import dayjs from 'dayjs'
+import PromptMsg from "@/components/PromptMsg.vue";
+//提示组件 信息初始化
+const toastMessage = ref('')
 
 //时间
 // currentTime 是 Ref<string> 类型，.value 为字符串
@@ -82,6 +85,7 @@ async function handleUpdate(){
     email: myInfo.value.email,
     password: myInfo.value.password
   })
+  toastMessage.value="充值成功"
 }
 </script>
 
@@ -131,6 +135,7 @@ async function handleUpdate(){
 
     </div>
   </div>
+  <PromptMsg :message="toastMessage" @clearMessage="toastMessage = ''" />
 </template>
 
 <style scoped>

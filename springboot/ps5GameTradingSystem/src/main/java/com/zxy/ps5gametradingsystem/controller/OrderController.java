@@ -26,7 +26,7 @@ public class OrderController {
     @GetMapping("/queryAll")
     public Result queryAll(@RequestParam(defaultValue = "1") String userId,
                               @RequestParam(defaultValue = "1") Integer pageNum) {
-        int pageSize = 2;
+        int pageSize = 5;
         // 创建分页对象
         Page<Order> page = new Page<>(pageNum, pageSize);
         // 调用分页查询方法

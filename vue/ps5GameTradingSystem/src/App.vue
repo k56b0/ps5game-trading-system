@@ -1,4 +1,5 @@
 <template>
+
   <!--顶部横幅图-->
     <div class="topBanner"></div>
   <!--  导航栏 开始-->
@@ -73,15 +74,21 @@
     <div class="slogan"><img src="@/assets/images/底部/slogan2026.jpg" alt=""></div>
 
   </footer>
+  <PromptMsg :message="toastMessage" @clearMessage="toastMessage = ''" />
+
 </template>
 
 <script setup lang="ts">
 // 引入 routerView,让路由器知道，把 视图放在哪里
 import {RouterView,RouterLink}from 'vue-router'
 import {useUserStore} from '@/store/userStore.ts'
+import PromptMsg from "@/components/PromptMsg.vue";
+//提示组件 信息初始化
+const toastMessage = ref('')
 /* 引入storeToRefs */
 import { storeToRefs } from 'pinia'
 import {useShoppingCarStore} from '@/store/shoppingCarStore.ts'
+import {ref} from "vue";
 const useShoppingCar = useShoppingCarStore()
 // 默认 没有登陆
 // let isLoginMark = ref(false)
@@ -90,8 +97,15 @@ const {isLoginMark} = storeToRefs(useUserStore())
 const {shoppingCarQuantity} = storeToRefs(useShoppingCar)
 const {myInfo:{value:temp}} = storeToRefs(useUserStore())
 function userCheckIn() {
-  temp.checkIn +=1
+  if(isLoginMark.value==false){
+    toastMessage.value="请先登录"
+  }else{
+    temp.checkIn +=1
+    toastMessage.value="签到成功"
+  }
+
 }
+
 
 </script>
 

@@ -5,7 +5,12 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: 123456
-    url: jdbc:mysql://localhost:3306/ps5game?rewriteBatchedStatements=true&useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/ps5game?rewriteBatchedStatements=true&useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&useSSL=false&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true
+    sql:
+      init:
+        mode: always
+        # schema-locations: classpath:schema.sql   # 默认位置，可不写
+        # data-locations: classpath:data.sql       # 默认位置，可不写
 mybatis-plus:
     # 配置类型别名包扫描路径
     type-aliases-package: com.zxy.ps5gametradingsystem.entity

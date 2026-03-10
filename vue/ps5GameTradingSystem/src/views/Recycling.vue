@@ -5,7 +5,9 @@ import type {recycle} from '@/types/recycle.ts'
 import {storeToRefs} from "pinia";
 import {computed, onMounted, ref} from "vue";
 import { v4 as uuidv4 } from 'uuid'
-
+import PromptMsg from "@/components/PromptMsg.vue";
+//提示组件 信息初始化
+const toastMessage = ref('')
 
 const useRecycle = useRecycleStore()
 const useUser = useUserStore()
@@ -57,7 +59,7 @@ async function handleAdd(){
   }else{
     await useRecycle.add(newRecycle.value)
     reset()
-    alert("回收成功")
+    toastMessage.value = '回收成功'
   }
 
   //查询用户回收记录
@@ -158,7 +160,9 @@ async function handleAdd(){
 
     </div>
 
+
   </div>
+  <PromptMsg :message="toastMessage" @clearMessage="toastMessage = ''" />
 </template>
 
 <style scoped>

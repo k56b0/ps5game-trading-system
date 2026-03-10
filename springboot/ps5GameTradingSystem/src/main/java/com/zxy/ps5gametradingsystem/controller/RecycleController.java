@@ -82,7 +82,7 @@ public class RecycleController {
     //查询用户全部回收游戏信息 分页
     @GetMapping("/queryAll/{id}/{pageNum}")
     public Result queryAll(@PathVariable String id, @PathVariable Integer pageNum){
-        int pageSize = 2;
+        int pageSize = 5;
         // 创建分页对象
         Page<Recycle> page = new Page<>(pageNum, pageSize);
         // 构建查询条件

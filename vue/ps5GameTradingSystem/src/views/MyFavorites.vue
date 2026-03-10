@@ -14,6 +14,9 @@ const useFavorite = useFavoriteStore()
 const useGame =useGameStore()
 const {myFavoritesMap,current, pages}=storeToRefs(useFavorite)
 const {myInfo}=storeToRefs(useUser)
+import PromptMsg from "@/components/PromptMsg.vue";
+//提示组件 信息初始化
+const toastMessage = ref('')
 
 // 响应式数据
 const hoverOrderId = ref(null);
@@ -58,7 +61,7 @@ async function handleBatchDelete() {
       .map(game => game.id)
 
   if (selectedNames.length === 0) {
-    alert('未选中任何游戏，无法执行批量删除。')
+    toastMessage.value="未选中任何游戏，无法执行批量删除。"
     return
   }
   for (let i = 0; i < selectedNames.length; i++) {
@@ -194,7 +197,7 @@ const generateNewUUID = () => {
         </tbody>
 
       </table>
-      <p class="text-muted small mt-3"><i class="bi bi-info-circle"></i> 全选复选框支持“半选”状态（仅部分勾选时显示）。点击“批量删除”会模拟删除选中游戏(仅弹窗演示)。</p>
+
     </div>
   </div>
     <PageTurning
@@ -202,7 +205,9 @@ const generateNewUUID = () => {
         :allPage="allPage"
         @update:currentPage="handlePageChange"
     />
+    <p class="text-muted small mt-3"><i class="bi bi-info-circle"></i> 点击 眼睛小图标 进入游戏详情页面，可以添加进购物车</p>
   </div>
+  <PromptMsg :message="toastMessage" @clearMessage="toastMessage = ''" />
 </template>
 
 <style scoped>

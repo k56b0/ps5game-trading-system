@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { useUserStore} from '@/store/userStore.ts'
-import {reactive} from "vue";
+import {reactive, ref} from "vue";
 import {storeToRefs} from "pinia";
+import PromptMsg from "@/components/PromptMsg.vue";
+//提示组件 信息初始化
+const toastMessage = ref('')
 // const {myInfo:{value:info}} = storeToRefs(useLoginStore())
 const userStore = storeToRefs(useUserStore())
 
@@ -22,6 +25,7 @@ let myInfo=reactive({
 //发送修改请求
 async function handleUpdate(){
   await useUserStore().update(myInfo)
+  toastMessage.value="保存成功"
 }
 
 </script>
@@ -89,6 +93,7 @@ async function handleUpdate(){
       </div>
     </form>
   </div>
+  <PromptMsg :message="toastMessage" @clearMessage="toastMessage = ''" />
 
 </template>
 

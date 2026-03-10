@@ -13,6 +13,7 @@ import ShoppingCart from "@/views/ShoppingCart.vue";
 import PromptPage from "@/views/PromptPage.vue";
 import SearchGames from "@/views/SearchGames.vue";
 import GameDetails from "@/views/GameDetails.vue";
+import FindPassword from "@/views/FindPassword.vue";
 
 const router = createRouter({
     history:createWebHistory(),
@@ -76,6 +77,11 @@ const router = createRouter({
         {
             path:'/GameDetails',
             component:GameDetails
+        },
+
+        {
+            path:'/FindPassword',
+            component:FindPassword
         },
 
         {

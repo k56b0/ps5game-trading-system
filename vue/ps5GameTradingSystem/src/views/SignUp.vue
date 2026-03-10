@@ -1,13 +1,18 @@
 <script  setup lang="ts">
 import { ref, reactive } from 'vue'
+import {RouterLink}from 'vue-router'
 import {useUserStore} from '@/store/userStore.ts'
 import {useOrderStore} from '@/store/orderStore.ts'
 import {useRecycleStore} from '@/store/recycleStore.ts'
 import {useRechargeRecordStore} from '@/store/rechargeRecordStore.ts'
 import {useFavoriteStore} from '@/store/favoriteStore.ts'
 import {useShoppingCarStore} from '@/store/shoppingCarStore.ts'
+import PromptMsg from "@/components/PromptMsg.vue";
 import { v4 as uuidv4 } from 'uuid'
-
+import {useRouter } from 'vue-router'
+const router = useRouter()
+//提示组件 信息初始化
+const toastMessage = ref('')
 // 使用响应式状态
 let isSignup = ref(false)
 
@@ -92,7 +97,8 @@ async function handleLogin(){
       }
   )
 
-  alert('登录成功!')
+  // alert('登录成功!')
+  toastMessage.value = '登录成功'
   // 重置表单
   resetForm()
 
@@ -114,6 +120,15 @@ async function handleRegister(){
       }
   )
 }
+
+function returnHome(){
+  // 返回上一页，如果上一页不存在则默认回到首页（可选）
+  if (window.history.state?.back) {
+    router.back()
+  } else {
+    router.push('/') // 或者你想去的默认页面
+  }
+}
 </script>
 <template>
 <!--  使用响应式状态控制类名-->
@@ -132,10 +147,12 @@ async function handleRegister(){
           <span>密码</span>
           <input v-model="formDate.password" type="password" />
         </label>
-        <p class="forgot-pass"><a href="javascript:">忘记密码？</a></p>
+        <p class="forgot-pass">
+          <RouterLink to="/FindPassword" class="nav-link" >忘记密码？</RouterLink>
+        </p>
         <button type="submit" class="submit">登 录</button>
       </form>
-      <button type="button" class="fb-btn">暂 不 登 录</button>
+      <button type="button" class="fb-btn" @click="returnHome">暂 不 登 录</button>
 
     </div>
     <div class="sub-cont">
@@ -170,12 +187,14 @@ async function handleRegister(){
           </label>
           <button type="submit" class="submit">注 册</button>
         </form>
-        <button type="button" class="fb-btn">暂 不 注 册</button>
+        <button type="button" class="fb-btn" @click="returnHome">暂 不 注 册</button>
       </div>
     </div>
   </div>
   <div class="fill">
   </div>
+  <PromptMsg :message="toastMessage" @clearMessage="toastMessage = ''" />
+
 
 </template>
 

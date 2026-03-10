@@ -49,7 +49,7 @@ public class Recharge_recordController {
     //查询所有充值订单 分页
     @GetMapping("/queryAll/{id}/{pageNum}")
     public Result queryAll(@PathVariable String id, @PathVariable Integer pageNum){
-        int pageSize = 2;
+        int pageSize = 5;
         // 创建分页对象
         Page<Recharge_record> page = new Page<>(pageNum, pageSize);
         // 构建查询条件

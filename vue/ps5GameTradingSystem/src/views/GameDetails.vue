@@ -7,15 +7,19 @@ import { v4 as uuidv4 } from 'uuid'
 import {ref} from "vue";
 import {storeToRefs} from "pinia";
 import {useRouter } from 'vue-router'
+import PromptMsg from "@/components/PromptMsg.vue";
+//提示组件 信息初始化
+const toastMessage = ref('')
 
 const router = useRouter()
+
 // 使用 pinia
 const userStore =useUserStore()
 const useGame =useGameStore()
 const useFavorite = useFavoriteStore()
 const useShoppingCar = useShoppingCarStore()
 const { GameOneShow,discountedPrice} = storeToRefs(useGame);
-const { myInfo} = storeToRefs(userStore);
+const { myInfo,isLoginMark} = storeToRefs(userStore);
 const goBack = () => {
   // 返回上一页，如果上一页不存在则默认回到首页（可选）
   if (window.history.state?.back) {
@@ -30,40 +34,51 @@ const generateNewUUID = () => {
   uuid.value = uuidv4();
 };
 async function addFavorites(){
-  generateNewUUID()
-  await useFavorite.add(
-      {
-        id:uuid.value,
-        userId:myInfo.value.id,
-        gameName:GameOneShow.value.gameName,
-      }
-  )
-  //查询收藏夹信息
-  await useFavorite.queryAll(
-      {
-        userId:myInfo.value.id,
-        pageNum:1
-      }
-  )
+  if(isLoginMark.value == false){
+    toastMessage.value="请先登录"
+
+  }else{
+    generateNewUUID()
+    await useFavorite.add(
+        {
+          id:uuid.value,
+          userId:myInfo.value.id,
+          gameName:GameOneShow.value.gameName,
+        }
+    )
+    //查询收藏夹信息
+    await useFavorite.queryAll(
+        {
+          userId:myInfo.value.id,
+          pageNum:1
+        }
+    )
+    toastMessage.value="添加进收藏夹成功"
+  }
 }
-async function addShoppingCar(){
-  generateNewUUID()
-  await useShoppingCar.add(
-      {
-        id:uuid.value,
-        userId:myInfo.value.id,
-        price:discountedPrice.value ,
-        gameName:GameOneShow.value.gameName,
-        quantity:1
-      }
-  )
-  //查询收藏夹信息
-  await useShoppingCar.queryAll(
-      {
-        userId:myInfo.value.id,
-        pageNum:1
-      }
-  )
+async function addShoppingCar() {
+  if (isLoginMark.value == false) {
+    toastMessage.value = "请先登录"
+  } else {
+    generateNewUUID()
+    await useShoppingCar.add(
+        {
+          id: uuid.value,
+          userId: myInfo.value.id,
+          price: discountedPrice.value,
+          gameName: GameOneShow.value.gameName,
+          quantity: 1
+        }
+    )
+    //查询收藏夹信息
+    await useShoppingCar.queryAll(
+        {
+          userId: myInfo.value.id,
+          pageNum: 1
+        }
+    )
+    toastMessage.value="添加进购物车成功"
+  }
 }
 </script>
 
@@ -98,7 +113,7 @@ async function addShoppingCar(){
           </tr>
           <tr>
             <td>首发年份</td>
-            <td>{{GameOneShow.year}} 年</td>
+            <td>{{GameOneShow.year}} </td>
           </tr>
           <tr>
             <td>已售</td>
@@ -130,7 +145,7 @@ async function addShoppingCar(){
       </div>
     </div>
   </div>
-
+  <PromptMsg :message="toastMessage" @clearMessage="toastMessage = ''" />
 </template>
 
 <style scoped>

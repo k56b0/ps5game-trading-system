@@ -1,7 +1,10 @@
 package com.zxy.ps5gametradingsystem.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.zxy.ps5gametradingsystem.common.Result;
+import com.zxy.ps5gametradingsystem.entity.Shoppingcar;
 import com.zxy.ps5gametradingsystem.entity.User;
 import com.zxy.ps5gametradingsystem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,4 +53,28 @@ public class UserController {
             return Result.error(400,"邮箱已被注册",null);
         }
     }
+    //找回密码
+    @PostMapping("/findPassword")
+    public Result findPassword (@RequestBody User user){
+        // 1. 根据邮箱查询用户
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getEmail, user.getEmail());
+        User u = userService.getOne(queryWrapper); // 假设邮箱是唯一的
+        // 2. 如果用户不存在，返回null
+        if (u == null) {
+            return Result.error(400,"用户不存在",null);
+        }
+        // 3. 比较问题
+        if (u.getAnswer().equals(user.getAnswer())) {
+            // 4. 问题正确
+            //修改密码
+            u.setPassword(user.getPassword());
+            userService.update(u);
+            //返回正确提示
+            return Result.success();
+        }
+        // 5. 问题错误
+        return Result.error(400,"验证问题错误",null);
+    }
+
 }

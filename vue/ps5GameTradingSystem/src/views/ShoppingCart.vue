@@ -7,6 +7,9 @@ import {computed, reactive, ref} from 'vue';
 import PageTurning from "@/components/PageTurning.vue";
 import {storeToRefs} from "pinia";
 import { useRouter } from 'vue-router'
+import PromptMsg from "@/components/PromptMsg.vue";
+//提示组件 信息初始化
+const toastMessage = ref('')
 
 const router = useRouter()
 // user pinia
@@ -64,7 +67,7 @@ async function handleBatchDelete() {
       .map(game => game.id)
 
   if (selectedNames.length === 0) {
-    alert('未选中任何游戏，无法执行批量删除。')
+    toastMessage.value="未选中任何游戏，无法执行批量删除。"
     return
   }
   for (let i = 0; i < selectedNames.length; i++) {
@@ -83,7 +86,7 @@ async function handleCommitOrder(){
   const selected = myShoppingCarMap.value
       .filter(game => game.checked)
   if (selected.length === 0) {
-    alert('未选中任何游戏，无法执行订单提交。')
+    toastMessage.value="未选中任何游戏，无法执行订单提交。"
     return
   }
   await useShoppingCar.addToOrder(selected)
@@ -101,6 +104,7 @@ async function handleCommitOrder(){
         pageNum:1
       }
   )
+  toastMessage.value="添加订单成功"
 }
 /*处理页码变化 开始*/
 const currentPage = computed(() => current.value)
@@ -215,6 +219,7 @@ async function showDetail(gameName:string) {
         @update:currentPage="handlePageChange"
     />
   </div>
+  <PromptMsg :message="toastMessage" @clearMessage="toastMessage = ''" />
 
 </template>
 

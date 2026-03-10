@@ -55,7 +55,7 @@
   <!--尾部-->
   <footer>
     <div class="copy">
-      <div class="bottomLogo"><img src="@/assets/images/手柄logo-1.jpg" alt="logo"></div>
+      <div class="bottomLogo"><img src="@/assets/images/handleLogo.jpg" alt="logo"></div>
       <div class="link">
         <a href="#">PS5交易商城</a>
         |
@@ -65,13 +65,13 @@
         本网站所列数据，除特殊说明，所有数据均于自学习测试
       </div>
       <div class="verify">
-        <img src="@/assets/images/底部/truste.png" alt="">
-        <img src="@/assets/images/底部/v-logo-1.png" alt="">
-        <img src="@/assets/images/底部/v-logo-2.png" alt="">
-        <img src="@/assets/images/底部/v-logo-3.png" alt="">
+        <img src="@/assets/images/footer/truste.png" alt="">
+        <img src="@/assets/images/footer/v-logo-1.png" alt="">
+        <img src="@/assets/images/footer/v-logo-2.png" alt="">
+        <img src="@/assets/images/footer/v-logo-3.png" alt="">
       </div>
     </div>
-    <div class="slogan"><img src="@/assets/images/底部/slogan2026.jpg" alt=""></div>
+    <div class="slogan"><img src="@/assets/images/footer/slogan2026.jpg" alt=""></div>
 
   </footer>
   <PromptMsg :message="toastMessage" @clearMessage="toastMessage = ''" />

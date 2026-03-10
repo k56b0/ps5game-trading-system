@@ -111,26 +111,6 @@ const uuid = ref('');
 const generateNewUUID = () => {
   uuid.value = uuidv4();
 };
-// async function addShoppingCar(gameName:string) {
-//   generateNewUUID()
-//   await useShoppingCar.add(
-//       {
-//         id:uuid.value,
-//         userId:myInfo.value.id,
-//         //price这里是一个技术点，待修正
-//         price:1111111111,
-//         gameName:gameName,
-//         quantity:1
-//       }
-//   )
-//   //查询收藏夹信息
-//   await useShoppingCar.queryAll(
-//       {
-//         userId:myInfo.value.id,
-//         pageNum:1
-//       }
-//   )
-// }
 </script>
 
 <template>

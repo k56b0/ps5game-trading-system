@@ -281,7 +281,7 @@ button {
   top: 0;
   width: 900px;
   height: 100%;
-  background-image: url('@/assets/images/2026年1月.jpg');
+  background-image: url('@/assets/images/202601.jpg');
   background-size: cover;
   transition: -webkit-transform 0.6s ease-in-out;
   transition: transform 0.6s ease-in-out;

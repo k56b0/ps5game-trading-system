@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import ff7re from '@/assets/images/gameCover/ff7re.jpg'
+import robot from '@/assets/images/gameCover/robot.jpg'
+import ff7rb from '@/assets/images/gameCover/ff7rb.jpg'
 import ShowGoods from "@/components/ShowGoods.vue";
 import {useRouter} from 'vue-router'
 import {ref} from "vue";
@@ -81,19 +84,19 @@ function searchByCategory(categoryText:string) {
         <!-- 轮播内容 -->
         <div class="carousel-inner">
           <div class="carousel-item active">
-            <img src="@/assets/images/游戏封面图/最终幻想7重制版-1.jpg" class="d-block w-100" alt="最终幻想7重生">
+            <img src="../assets/images/gameCover/ff7rb.jpg" class="d-block w-100" alt="最终幻想7重生">
           </div>
           <div class="carousel-item">
-            <img src="@/assets/images/游戏封面图/宇宙机器人-1.jpg" class="d-block w-100" alt="宇宙机器人">
+            <img src="../assets/images/gameCover/robot.jpg" class="d-block w-100" alt="宇宙机器人">
           </div>
           <div class="carousel-item">
-            <img src="@/assets/images/游戏封面图/最终幻想7重生-1.jpg" class="d-block w-100" alt="最终幻想7重生">
+            <img src="../assets/images/gameCover/originSam.jpg" class="d-block w-100" alt="最终幻想7重生">
           </div>
           <div class="carousel-item">
-            <img src="@/assets/images/游戏封面图/宇宙机器人-1.jpg" class="d-block w-100" alt="宇宙机器人">
+            <img src="../assets/images/gameCover/robot.jpg" class="d-block w-100" alt="宇宙机器人">
           </div>
           <div class="carousel-item">
-            <img src="@/assets/images/游戏封面图/最终幻想7重生-1.jpg" class="d-block w-100" alt="宇宙机器人">
+            <img src="../assets/images/gameCover/ff7rb.jpg" class="d-block w-100" alt="宇宙机器人">
           </div>
         </div>
 
@@ -152,7 +155,7 @@ function searchByCategory(categoryText:string) {
   margin-right: 14%;
 }
 .navbar-toggler-icon{
-  background-image: url("@/assets/images/手柄logo-1.jpg");
+  background-image: url("@/assets/images/handleLogo.jpg");
 }
 .custom-collapse ul li:hover {
   border-bottom: 2px solid #ff6702;

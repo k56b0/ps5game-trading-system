@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zxy.ps5gametradingsystem.common.Result;
 import com.zxy.ps5gametradingsystem.entity.Game;
 import com.zxy.ps5gametradingsystem.entity.Recycle;
+import com.zxy.ps5gametradingsystem.entity.User;
 import com.zxy.ps5gametradingsystem.service.GameService;
 import com.zxy.ps5gametradingsystem.service.RecycleService;
 import com.zxy.ps5gametradingsystem.service.UserService;
@@ -33,18 +34,6 @@ public class RecycleController {
             Game g = gameService.getOne(queryWrapper);
             //当前价格
             double nowPrice =g.getPrice()*g.getDiscount();
-            //版本，国行 便宜一点，非国行贵一点。
-            //旧写法
-            /*
-            switch (s.getVersion()) {
-                case "国行":
-                    nowPrice=nowPrice*0.9;
-                    break;
-                case "非国行":
-                    nowPrice=nowPrice*0.95;
-                    break;
-            }
-             */
             nowPrice = switch (s.getVersion()) {
                 case "国行" -> nowPrice * 0.9;
                 case "非国行" -> nowPrice * 0.95;
@@ -90,6 +79,45 @@ public class RecycleController {
         queryWrapper.eq(Recycle::getUserId, id);
         // 执行分页查询
         Page<Recycle> resultPage = recycleService.page(page, queryWrapper);
+        return Result.success(resultPage);
+    }
+
+    //删除回收信息,测试成功
+    @DeleteMapping("/delete/{id}")
+    public Result delete(@PathVariable String id){
+        recycleService.removeById(id);
+        return  Result.success();
+    }
+    //添加回收信息（增）
+    @PostMapping("/addM")
+    public Result addM (@RequestBody Recycle g){
+        if(recycleService.save(g)){
+            //添加成功
+            return Result.success();
+        }else{
+            //添加失败
+            return Result.error(400,"添加失败",null);
+        }
+    }
+    //用户保存用户信息
+    @PostMapping("/update")
+    public Result update(@RequestBody Recycle g) {
+        boolean success = recycleService.updateById(g);  // 根据id更新
+        if (success) {
+            System.out.println("回收信息更新成功");
+            return Result.success(g);
+        } else {
+            return Result.error();
+        }
+    }
+    //查询回收游戏信息 分页
+    @GetMapping("/queryAllAll/{pageNum}")
+    public Result  queryAllAll(@PathVariable Integer pageNum){
+        int pageSize = 8;
+        // 创建分页对象
+        Page<Recycle> page = new Page<>(pageNum, pageSize);
+        // 执行分页查询
+        Page<Recycle> resultPage = recycleService.page(page);
         return Result.success(resultPage);
     }
 }

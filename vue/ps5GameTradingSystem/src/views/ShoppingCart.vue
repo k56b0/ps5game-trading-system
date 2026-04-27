@@ -70,6 +70,8 @@ async function handleBatchDelete() {
     toastMessage.value="未选中任何游戏，无法执行批量删除。"
     return
   }
+  const isConfirmed = confirm(`确定要删除选中的 ${selectedNames.length} 个回收订单吗？此操作不可恢复。`);
+  if (!isConfirmed) return;
   for (let i = 0; i < selectedNames.length; i++) {
     await useShoppingCar.delete(selectedNames[i] as string)
   }
@@ -89,6 +91,8 @@ async function handleCommitOrder(){
     toastMessage.value="未选中任何游戏，无法执行订单提交。"
     return
   }
+  const isConfirmed = confirm(`确定要提交并支付的 ${selected.length} 个商品的订单吗？此操作不可恢复。`);
+  if (!isConfirmed) return;
   await useShoppingCar.addToOrder(selected)
   //查询购物车信息
   await useShoppingCar.queryAll(
@@ -145,7 +149,6 @@ async function showDetail(gameName:string) {
             >{{ selectedCount }}</span> 款游戏</span>
       </div>
       <div>
-        <!-- 批量删除演示按钮 —— 体现多选的实用价值 -->
         <button class="btn btn-sm btn-outline-danger" id="batchDeleteBtn" @click="handleBatchDelete">
           <i class="bi bi-trash3"></i> 批量删除
         </button>

@@ -30,7 +30,7 @@ function computedPrice(val1:number,val2:number){
 async function showDetail(gameName:string) {
   try {
     // 1. 先查询游戏详情（等待完成）
-    await useGame.queryByName(gameName)
+    await useGame.queryByName(gameName,false)
     // 2. 查询成功后跳转到详情页
     // 方式一：通过 query 传递参数（适用于任何路由配置）
     // router.push({ path: '/GameDetails', query: { name: gameName } })

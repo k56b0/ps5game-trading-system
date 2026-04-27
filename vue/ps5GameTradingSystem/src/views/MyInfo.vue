@@ -32,7 +32,6 @@ async function handleUpdate(){
 
 <template>
   <div class="container">
-<!--    水平表单-->
     <form @submit.prevent="handleUpdate">
     <!-- 使用 row 和 col-form-label -->
       <!-- 使用 row 和 mb-3（间距） -->
@@ -76,6 +75,12 @@ async function handleUpdate(){
         <label class="col-sm-2 col-form-label">签到天数</label>
         <div class="col-sm-8">
           <span >{{myInfo.checkIn}}</span>
+        </div>
+      </div>
+      <div class="row mb-md-1 py-sm-1">
+        <label class="col-sm-2 col-form-label">签到时间</label>
+        <div class="col-sm-8">
+          <span >{{myInfo.checkTime}}</span>
         </div>
       </div>
       <div class="row mb-md-1 py-sm-1">

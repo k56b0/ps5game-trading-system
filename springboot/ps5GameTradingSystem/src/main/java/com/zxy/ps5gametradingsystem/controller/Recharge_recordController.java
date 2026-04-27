@@ -25,7 +25,7 @@ public class Recharge_recordController {
         // 保存充值记录
         rechargeRecordService.save(s);
         // 1. 先查询用户当前余额
-        User user = userService.getById(s.getUserId()); // 假设充值记录中有userId字段
+        User user = userService.getById(s.getUserId());
         if (user != null) {
             // 2. 计算新的余额（当前余额 + 充值金额）
             Integer newBalance = user.getMoney()+s.getQuantity();
@@ -44,7 +44,6 @@ public class Recharge_recordController {
         } else {
             return Result.error();
         }
-
     }
     //查询所有充值订单 分页
     @GetMapping("/queryAll/{id}/{pageNum}")

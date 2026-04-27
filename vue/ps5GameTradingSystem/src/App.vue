@@ -1,13 +1,10 @@
 <template>
-
   <!--顶部横幅图-->
     <div class="topBanner"></div>
   <!--  导航栏 开始-->
     <div class="navbar navbar-expand-lg  ">
       <div class="container-fluid">
-
         <div class="navbar-brand custom-navbar" href="" >PS5 游戏交易平台</div>
-
         <div class="collapse navbar-collapse "  >
           <ul class="navbar-nav">
             <li class="nav-item">
@@ -23,6 +20,9 @@
             <li class="nav-item">
               <RouterLink to="/ProblemFeedBack" class="nav-link" active-class="active">问题反馈</RouterLink>
             </li>
+            <li class="nav-item">
+              <RouterLink v-if="myInfo.isManage==0" to="/Management/ManageGame" class="nav-link" active-class="active">管理员界面</RouterLink>
+            </li>
           </ul>
         </div>
 
@@ -37,17 +37,15 @@
           </ul>
           <div class="shoppingCart">
             <RouterLink v-if="isLoginMark" to="/ShoppingCart" class="nav-link" >
-              <i class="bi bi-cart"></i>购物车( {{shoppingCarQuantity}} )
+              <i class="bi bi-cart"></i>购物车( {{total}} )
             </RouterLink>
             <RouterLink v-else to="/PromptPage" class="nav-link" >
-              <i class="bi bi-cart"></i>购物车( {{shoppingCarQuantity}} )
+              <i class="bi bi-cart"></i>购物车( {{total}} )
             </RouterLink>
           </div>
         </div>
       </div>
     </div>
-  <!--  导航栏 结束-->
-
   <!--展示区-->
   <div class="main-content">
     <RouterView></RouterView>
@@ -75,14 +73,13 @@
 
   </footer>
   <PromptMsg :message="toastMessage" @clearMessage="toastMessage = ''" />
-
 </template>
-
 <script setup lang="ts">
 // 引入 routerView,让路由器知道，把 视图放在哪里
 import {RouterView,RouterLink}from 'vue-router'
 import {useUserStore} from '@/store/userStore.ts'
 import PromptMsg from "@/components/PromptMsg.vue";
+const userStore = useUserStore();
 //提示组件 信息初始化
 const toastMessage = ref('')
 /* 引入storeToRefs */
@@ -91,19 +88,27 @@ import {useShoppingCarStore} from '@/store/shoppingCarStore.ts'
 import {ref} from "vue";
 const useShoppingCar = useShoppingCarStore()
 // 默认 没有登陆
-// let isLoginMark = ref(false)
 /* 使用storeToRefs转换useLoginStore()，随后解构 */
 const {isLoginMark} = storeToRefs(useUserStore())
 const {shoppingCarQuantity} = storeToRefs(useShoppingCar)
+const {total} = storeToRefs(useShoppingCar)
 const {myInfo:{value:temp}} = storeToRefs(useUserStore())
-function userCheckIn() {
-  if(isLoginMark.value==false){
-    toastMessage.value="请先登录"
-  }else{
-    temp.checkIn +=1
-    toastMessage.value="签到成功"
+const { myInfo } = storeToRefs(useUserStore())
+async function userCheckIn() {
+  const userId = userStore.myInfo?.id;
+  if (!userId) {
+    toastMessage.value = '请先登录';
+    return;
   }
 
+  const success = await userStore.checkIn(userId);
+  if (success) {
+    toastMessage.value = '签到成功';
+    // 如果需要刷新当前页面的用户信息显示，可重新查询
+    // await userStore.queryAll({ pageNum: current.value });
+  } else {
+    toastMessage.value = '签到失败，请重试';
+  }
 }
 
 

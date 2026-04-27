@@ -1,8 +1,9 @@
 // 引入defineStore用于创建store
 import {defineStore} from 'pinia'
 import httpAxios from '@/utils/http'
-import type { game,games } from '@/types/game.ts'
+import type {game, gameItemMap, gameItemMaps, games} from '@/types/game.ts'
 import {ref} from "vue";
+import type {favoriteItems} from "@/types/favorite.ts";
 
 // 定义并暴露一个store
 export const useGameStore = defineStore('gameStore', {
@@ -22,6 +23,21 @@ export const useGameStore = defineStore('gameStore', {
                     this.pages = result.data.pages;
                     this.total = result.data.total;
                     this.currentCategory=null;
+                    // 将后端数据映射为前端所需格式
+                    this.myGamesMap = this.Games.map(item => ({
+                        id:item.id,
+                        englishName:item.englishName,
+                        gameName:item.gameName,
+                        price:item.price,
+                        discount:item.discount,
+                        inventory:item.inventory,
+                        category:item.category,
+                        sales:item.sales,
+                        introduction:item.introduction,
+                        year:item.year,
+                        img:item.img,
+                        checked: false // 初始化未选中
+                    }))
                 } else {
                     console.error('查询失败', result.message);
                 }
@@ -90,8 +106,54 @@ export const useGameStore = defineStore('gameStore', {
                 console.error('网络错误或请求异常:', error);
             }
         },
-
-
+        async delete(id:string){
+            try {
+                const response = await httpAxios.delete(`/game/delete/${id}`)
+                //取出response.data，即后端的 Result 对象，并且做成响应式
+                const result =  response.data
+                if (result.code === 200) {
+                    console.log("success")
+                    return true
+                }else {
+                    console.error('删除失败', result.message);
+                    return false;
+                }
+            }catch (error) {
+                console.error('删除失败:', error)
+            }
+        },
+        async update(game: game) {
+            try {
+                const response = await httpAxios.post('/game/update',game);
+                const result = response.data;
+                if (result.code === 200) {
+                    console.log('更新成功');
+                    return true;
+                } else {
+                    console.error('更新失败', result.message);
+                    return false;
+                }
+            } catch (error) {
+                console.error('网络错误', error);
+                return false;
+            }
+        },
+        async add(game: game) {   // 注意类型改为 game
+            try {
+                const response = await httpAxios.post('/game/add', game);
+                const result = response.data;
+                if (result.code === 200) {
+                    console.log('添加成功');
+                    return true;
+                } else {
+                    console.error('添加失败', result.message);
+                    return false;
+                }
+            } catch (error) {
+                console.error('网络错误', error);
+                return false;
+            }
+        }
     },
     // 状态
     state(){
@@ -104,6 +166,7 @@ export const useGameStore = defineStore('gameStore', {
             PushPageGames2: [] as games,  // 类型断言
             PushPageGames3: [] as games,  // 类型断言
             Games: [] as games,  // 类型断言
+            myGamesMap:<gameItemMaps>([]),
             GameOneShow: {} as game,
             currentCategory : null as string | null// 新增：当前选中的分类，null 表示全部
         }

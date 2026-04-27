@@ -14,6 +14,11 @@ import PromptPage from "@/views/PromptPage.vue";
 import SearchGames from "@/views/SearchGames.vue";
 import GameDetails from "@/views/GameDetails.vue";
 import FindPassword from "@/views/FindPassword.vue";
+import Management from "@/views/Management.vue";
+import ManageGame from "@/views/ManageGame.vue";
+import ManageUser from "@/views/ManageUser.vue";
+import ManageRecycle from "@/views/ManageRecycle.vue";
+
 
 const router = createRouter({
     history:createWebHistory(),
@@ -82,6 +87,25 @@ const router = createRouter({
         {
             path:'/FindPassword',
             component:FindPassword
+        },
+        {
+            path:'/Management',
+            component:Management,
+            children:[
+                {
+                    // 子集不需要写 '/'
+                    path:'ManageGame',
+                    component:ManageGame
+                },
+                {
+                    path:'ManageUser',
+                    component:ManageUser
+                },
+                {
+                    path:'ManageRecycle',
+                    component:ManageRecycle
+                },
+            ]
         },
 
         {

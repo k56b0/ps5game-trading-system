@@ -3,13 +3,12 @@ package com.zxy.ps5gametradingsystem.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zxy.ps5gametradingsystem.common.Result;
+import com.zxy.ps5gametradingsystem.entity.Favorites;
 import com.zxy.ps5gametradingsystem.entity.Game;
+import com.zxy.ps5gametradingsystem.entity.User;
 import com.zxy.ps5gametradingsystem.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -25,6 +24,34 @@ public class GameController {
     private GameService gameService;
     boolean isByDescA=true;
     boolean isByDescB=true;
+    //删除游戏信息,测试成功
+    @DeleteMapping("/delete/{id}")
+    public Result delete(@PathVariable String id){
+        gameService.removeById(id);
+        return  Result.success();
+    }
+    //添加游戏（增）
+    @PostMapping("/add")
+    public Result add (@RequestBody Game g){
+        if(gameService.save(g)){
+            //添加成功
+            return Result.success();
+        }else{
+            //添加失败
+            return Result.error(400,"添加失败",null);
+        }
+    }
+    //用户保存用户信息
+    @PostMapping("/update")
+    public Result update(@RequestBody Game g) {
+        boolean success = gameService.updateById(g);  // 根据id更新
+        if (success) {
+            System.out.println("游戏信息更新成功");
+            return Result.success(g);
+        } else {
+            return Result.error();
+        }
+    }
     //根据游戏 ID 查询单个游戏信息
     @GetMapping("/queryByID/{id}")
     public Result  queryByID(@PathVariable String id){

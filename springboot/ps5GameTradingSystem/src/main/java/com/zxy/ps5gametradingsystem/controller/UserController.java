@@ -3,12 +3,14 @@ package com.zxy.ps5gametradingsystem.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zxy.ps5gametradingsystem.common.Result;
-import com.zxy.ps5gametradingsystem.entity.Shoppingcar;
-import com.zxy.ps5gametradingsystem.entity.User;
+import com.zxy.ps5gametradingsystem.entity.*;
 import com.zxy.ps5gametradingsystem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 
 @RestController
 @RequestMapping("/user")
@@ -77,4 +79,68 @@ public class UserController {
         return Result.error(400,"验证问题错误",null);
     }
 
+    //查询全部用户信息 分页
+    @GetMapping("/queryAll/{pageNum}")
+    public Result  queryAll(@PathVariable Integer pageNum){
+        int pageSize = 8;
+        // 创建分页对象
+        Page<User> page = new Page<>(pageNum, pageSize);
+        // 执行分页查询
+        Page<User> resultPage = userService.page(page);
+        return Result.success(resultPage);
+    }
+    //删除游戏信息,测试成功
+    @DeleteMapping("/delete/{id}")
+    public Result delete(@PathVariable String id){
+        userService.removeById(id);
+        return  Result.success();
+    }
+    //添加用户（增）
+    @PostMapping("/add")
+    public Result add (@RequestBody User g){
+        if(userService.save(g)){
+            //添加成功
+            return Result.success();
+        }else{
+            //添加失败
+            return Result.error(400,"添加失败",null);
+        }
+    }
+    //签到
+    @PostMapping("/checkIn")
+    public Result checkIn(@RequestParam String id) {
+        // 1. 查询用户
+        User existingUser = userService.getById(id);
+        if (existingUser == null) {
+            return Result.error(404, "用户不存在", null);
+        }
+
+        Date now = new Date();
+        Date lastCheckTime = existingUser.getCheckTime();
+
+        // 2. 判断签到间隔（首次签到或超过24小时）
+        boolean canCheckIn = (lastCheckTime == null);
+        if (!canCheckIn) {
+            long diffHours = (now.getTime() - lastCheckTime.getTime()) / (1000 * 60 * 60);
+            if (diffHours > 24) {
+                canCheckIn = true;
+            }
+        }
+
+        if (!canCheckIn) {
+            return Result.error(400, "间隔时间不足24h，不能重复签到", null);
+        }
+
+        // 3. 执行签到
+        existingUser.setCheckIn(existingUser.getCheckIn() + 1);
+        existingUser.setCheckTime(now);
+        boolean updated = userService.updateById(existingUser);
+
+        if (updated) {
+            // 返回最新签到天数
+            return Result.success(existingUser.getCheckIn());
+        } else {
+            return Result.error(500, "签到失败，请重试", null);
+        }
+    }
 }

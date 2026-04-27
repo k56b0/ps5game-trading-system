@@ -49,7 +49,7 @@ async function handleAdd(){
       userId: myInfo.value.id,
       gameName: gameName.value,
       valuation: newRecycle.value.valuation, // 可能需要在提交后由后端计算，暂时留空
-      recyclingStatus: '回收完毕', // 初始状态
+      recyclingStatus: '待回收', // 初始状态
       version: version.value === 'guohang' ? '国行' : '非国行',
       language: language.value === 'ChineseSupport' ? '支持中文' : '不支持中文',
       appearance: appearance.value=== 'appearanceA' ? '光盘无划痕' : appearance.value === 'appearanceB' ? '光盘轻微划痕' : '光盘严重划痕',
@@ -76,7 +76,7 @@ async function handleAdd(){
   <div class="container-fluid">
     <div class="row justify-content-center">
       <h1>回收评估</h1>
-      <h3>寄售商品将经过专业质检，请如实选择商品选项</h3>
+      <h3>寄售商品将经过专业质检，请如实选择商品选项；回收邮寄地址为北京市最终幻想大厦</h3>
     </div>
     <div class="row justify-content-center">
       <div class="col-sm-4 center-col">

@@ -3,6 +3,8 @@ package com.zxy.ps5gametradingsystem.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 @TableName("`user`")
 public class User {
@@ -15,5 +17,6 @@ public class User {
     private String email;
     private String address;
     private String answer;
-    private String checkTime;
-    private Integer money;}
+    private Date checkTime;
+    private Integer money;
+    private Integer isManage;}

@@ -19,4 +19,5 @@ public class Game {
     private  String introduction;
     private  String year;
     private  String img;
+
 }

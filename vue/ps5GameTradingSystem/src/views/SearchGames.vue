@@ -42,9 +42,6 @@ onMounted(async ()=>{
       await useGame.queryAll(1);
     }
   }
-
-
-
 })
 //计算折扣价——既读取又修改
 function computedPrice(val1:number,val2:number){

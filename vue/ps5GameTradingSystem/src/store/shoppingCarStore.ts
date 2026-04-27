@@ -68,7 +68,6 @@ export const useShoppingCarStore = defineStore('shoppingCarStore', {
                 const orderStore=useOrderStore()
                 // order 对象
                 let data:order = orderStore.newOrder(selectedNames)
-
                 const response = await httpAxios.post("/shoppingcar/addToOrder",data)
                 //取出response.data，即后端的 Result 对象，并且做成响应式
                 const result =  response.data

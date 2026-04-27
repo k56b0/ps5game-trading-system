@@ -10,6 +10,7 @@ import {useShoppingCarStore} from '@/store/shoppingCarStore.ts'
 import PromptMsg from "@/components/PromptMsg.vue";
 import { v4 as uuidv4 } from 'uuid'
 import {useRouter } from 'vue-router'
+import {storeToRefs} from "pinia";
 const router = useRouter()
 //提示组件 信息初始化
 const toastMessage = ref('')
@@ -29,6 +30,7 @@ const recycleStore =useRecycleStore()
 const rechargeRecordStore =useRechargeRecordStore()
 const useFavorite = useFavoriteStore()
 const useShoppingCar = useShoppingCarStore()
+const {isLoginMark} = storeToRefs(userStore);
 // 切换登陆状态
 function toggleSignup(){
   isSignup.value = !isSignup.value
@@ -96,11 +98,10 @@ async function handleLogin(){
         pageNum:1
       }
   )
+    // 重置表单
+    resetForm()
 
-  // alert('登录成功!')
-  toastMessage.value = '登录成功'
-  // 重置表单
-  resetForm()
+
 
 }
 //获取 UUID
@@ -108,8 +109,14 @@ const uuid = ref('');
 const generateNewUUID = () => {
   uuid.value = uuidv4();
 };
-
+//注册功能
 async function handleRegister(){
+  // 重置表单
+  const resetForm = () => {
+    formDate.email = ''
+    formDate.password = ''
+    formDate.userName = ''
+  }
   generateNewUUID()
   await userStore.register(
       {
@@ -119,6 +126,10 @@ async function handleRegister(){
         password: formDate.password
       }
   )
+  // alert('注册成功')
+  toastMessage.value = '注册成功'
+  // 重置表单
+  resetForm()
 }
 
 function returnHome(){

@@ -7,13 +7,13 @@ import {RouterView,RouterLink}from 'vue-router'
   <div class="container-fluid">
 <!--    导航区-->
     <div class=" Item1">
-      <span class="text"><i class="bi bi-playstation"></i>  管理员界面</span>
+      <span class="text"><i class="bi bi-collection-fill"></i>  管理员界面</span>
     </div>
     <div class=" Item3">
       <br>
       <ul class="list-group custom-item ">
-        <RouterLink to="/Management/ManageGame"  class="list-group-item" active-class="active">游戏管理</RouterLink>
         <RouterLink to="/Management/ManageUser"  class="list-group-item" active-class="active">用户管理</RouterLink>
+        <RouterLink to="/Management/ManageGame"  class="list-group-item" active-class="active">游戏管理</RouterLink>
         <RouterLink to="/Management/ManageRecycle"  class="list-group-item" active-class="active">二手回收管理</RouterLink>
       </ul>
     </div>

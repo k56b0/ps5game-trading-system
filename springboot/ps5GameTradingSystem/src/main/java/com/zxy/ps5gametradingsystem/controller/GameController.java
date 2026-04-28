@@ -62,20 +62,21 @@ public class GameController {
             return Result.error();
         }
     }
-    //根据游戏名称查询单个游戏信息
-    @GetMapping("/queryByName/{name}")
-    public Result  queryByName(@PathVariable String name){
-        //查询条件：查同名的游戏
-        LambdaQueryWrapper<Game> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Game::getGameName, name);
-        Game g = gameService.getOne(queryWrapper);
-        // 返回查到的游戏
-        if(g !=null){
-            return Result.success(g);
-        }else{
-            return  Result.error();
+        @GetMapping("/queryByName/{name}/{pageNum}")
+        public Result queryByName(@PathVariable String name, @PathVariable Integer pageNum) {
+            // 每页 10 条，可根据需求调整
+            Page<Game> page = new Page<>(pageNum, 10);
+            LambdaQueryWrapper<Game> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.like(Game::getGameName, name);
+            Page<Game> gamePage = gameService.page(page, queryWrapper);
+
+            if (gamePage.getTotal() > 0) {
+                return Result.success(gamePage);
+            } else {
+                // 无结果时也返回成功，空列表让前端友好展示
+                return Result.success(gamePage);
+            }
         }
-    }
     //查询全部游戏信息 分页
     @GetMapping("/queryAll/{pageNum}")
     public Result  queryAll(@PathVariable Integer pageNum){

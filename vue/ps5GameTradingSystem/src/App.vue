@@ -29,7 +29,20 @@
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav">
             <li class="nav-item" style="margin-left: 170px;">
-              <RouterLink to="/SignUp" class="nav-link" >登录</RouterLink>
+              <!-- 已登录 → 显示按钮：退出登录 -->
+              <button
+                  v-if="isLoginMark"
+                  class="nav-link"
+                  style="background:none;border:none;cursor:pointer;"
+                  @click="handleLogout"
+              >
+                退出登录
+              </button>
+
+              <!-- 未登录 → 去登录页 -->
+              <RouterLink v-else to="/SignUp" class="nav-link">
+                进行登录
+              </RouterLink>
             </li>
             <li class="nav-item">
               <button class="nav-link" @click="userCheckIn">每日签到</button>
@@ -107,9 +120,20 @@ async function userCheckIn() {
     // 如果需要刷新当前页面的用户信息显示，可重新查询
     // await userStore.queryAll({ pageNum: current.value });
   } else {
-    toastMessage.value = '签到失败，请重试';
+    toastMessage.value = '签到失败，请确保和上次签到距离24小时';
   }
 }
+  // 退出登录 + 确认提示
+  const handleLogout = () => {
+    // 浏览器原生确认框
+    const confirmLogout = confirm("确定要退出登录吗？")
+
+    // 如果用户点了确认 → 才退出
+    if (confirmLogout) {
+      userStore.logout()
+      toastMessage.value = "退出登录成功"
+    }
+  }
 
 
 </script>

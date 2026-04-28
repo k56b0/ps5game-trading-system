@@ -45,25 +45,61 @@ export const useGameStore = defineStore('gameStore', {
                 console.error('网络错误或请求异常:', error);
             }
         },
-        async queryByName(gameName:string,isSearch:boolean ) {
+        // async queryByName(gameName: string, isSearch: boolean) {
+        //     try {
+        //         const response = await httpAxios.get(`/game/queryByName/${encodeURIComponent(gameName)}`);
+        //         const result = response.data;
+        //
+        //         if (result.code === 200) {
+        //             if (!isSearch) {
+        //                 this.GameOneShow = result.data?.[0] || {};
+        //             } else {
+        //                 this.Games = result.data || [];
+        //                 this.current = 1;
+        //                 this.pages = 1;
+        //                 this.total = this.Games.length;    // 根据实际需求设置总数
+        //             }
+        //         } else {
+        //             // 其他业务错误（如后端抛异常）才进入这里
+        //             console.error('查询异常', result.message);
+        //             if (isSearch) this.Games = [];
+        //         }
+        //     } catch (error) {
+        //         console.error('网络错误', error);
+        //         if (isSearch) this.Games = [];
+        //     }
+        // },
+        async queryByName(gameName: string, isSearch: boolean, pageNum: number = 1) {
             try {
-                // 根据实际 baseURL 调整路径
-                const response = await httpAxios.get(`/game/queryByName/${gameName}`);
+                const response = await httpAxios.get(
+                    `/game/queryByName/${encodeURIComponent(gameName)}/${pageNum}`
+                );
                 const result = response.data;
-
                 if (result.code === 200) {
-                    if(!isSearch){
-                        this.GameOneShow=result.data
-                    }else{
-                        this.Games= [result.data]
-                        this.current = 1;
-                        this.pages = 1;
+                    if (!isSearch) {
+                        // 详情页：取第一条数据
+                        this.GameOneShow = result.data.records?.[0] || {};
+                    } else {
+                        // 搜索列表页
+                        this.Games = result.data.records;
+                        this.current = result.data.current;
+                        this.pages = result.data.pages;
+                        this.total = result.data.total;
+                        this.searchKeyword = gameName;   // 保存关键词，供翻页使用
                     }
                 } else {
-                    console.error('查询失败', result.message);
+                    console.error("查询异常", result.message);
+                    if (isSearch) {
+                        this.Games = [];
+                        this.searchKeyword = '';
+                    }
                 }
             } catch (error) {
-                console.error('网络错误或请求异常:', error);
+                console.error("网络错误", error);
+                if (isSearch) {
+                    this.Games = [];
+                    this.searchKeyword = '';
+                }
             }
         },
         async queryPushPage(choice:string ) {
@@ -168,6 +204,7 @@ export const useGameStore = defineStore('gameStore', {
             Games: [] as games,  // 类型断言
             myGamesMap:<gameItemMaps>([]),
             GameOneShow: {} as game,
+            searchKeyword: '' as string,      // 当前搜索关键词
             currentCategory : null as string | null// 新增：当前选中的分类，null 表示全部
         }
     },

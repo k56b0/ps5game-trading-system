@@ -100,7 +100,6 @@ const middlePages = computed<(number | string)[]>(() => {
 .pagination {
   display: flex;
   justify-content: center;
-  margin: 15px 0;
 }
 .pagination .page-link {
   width: 60px;          /* 你想要的具体宽度 */

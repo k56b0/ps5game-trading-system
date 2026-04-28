@@ -23,6 +23,8 @@ export const useUserStore = defineStore('userStore',{
                     //让pinia存一下
                     this.isLoginMark=true
                     this.myInfo=user
+                    // ✅【新加】登录成功后保存到本地存储
+                    localStorage.setItem('userInfo', JSON.stringify(user))
                     alert('登录成功')
 
                 } else {
@@ -174,19 +176,11 @@ export const useUserStore = defineStore('userStore',{
                 console.error('签到请求失败:', error);
                 return false;
             }
-        }
-    },
-    // 状态
-    state(){
-        return {
-            isLoginMark:false,
-            errorMsg:'',
-            current:0,
-            pages:0,
-            total:0,
-            myUsers: [] as users,  // 类型断言
-            myUsersMap:<userItemMaps>([]),
-            myInfo:reactive<user>({
+        },
+        // ✅【直接加进你的 actions】
+        logout() {
+            this.isLoginMark = false
+            this.myInfo = reactive({
                 id:'',
                 userName:'',
                 gender:'',
@@ -200,6 +194,36 @@ export const useUserStore = defineStore('userStore',{
                 money:0,
                 isManage:1
             })
+            // ✅【新加】退出时清除本地存储
+            localStorage.removeItem('userInfo')
+        }
+    },
+    // 状态
+    state(){
+        return {
+            errorMsg:'',
+            current:0,
+            pages:0,
+            total:0,
+            myUsers: [] as users,  // 类型断言
+            myUsersMap:<userItemMaps>([]),
+            isLoginMark: localStorage.getItem('userInfo') ? true : false,
+            myInfo: localStorage.getItem('userInfo')
+                ? JSON.parse(localStorage.getItem('userInfo')!)
+                : reactive<user>({
+                    id:'',
+                    userName:'',
+                    gender:'',
+                    birth:'2025-01-01',
+                    password:'默认值',
+                    checkIn:'0',
+                    email:'1111111@qq.com',
+                    address:'默认值',
+                    answer:'',
+                    checkTime:'2025-01-01 00:00:00 ',
+                    money:0,
+                    isManage:1
+                })
         }
     },
     // 计算

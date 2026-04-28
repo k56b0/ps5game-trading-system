@@ -165,8 +165,7 @@ const saveNewRecycle = async () => {
       <thead>
       <tr>
         <th class="align-middle text-center"><input class="form-check-input" type="checkbox" :checked="selectAll" @change="toggleSelectAll"></th>
-        <th>订单ID</th>
-        <th>用户ID</th>
+        <th>回收ID</th>
         <th>游戏名称</th>
         <th>估价</th>
         <th>回收状态</th>
@@ -184,7 +183,6 @@ const saveNewRecycle = async () => {
           :class="{ 'hover-active': hoverRecycleId === item.id }">
         <td class="align-middle text-center"><input class="form-check-input row-checkbox" type="checkbox" v-model="item.checked"></td>
         <td>{{ item.id }}</td>
-        <td>{{ item.userId }}</td>
         <td>{{ item.gameName }}</td>
         <td>{{ item.valuation }}</td>
         <td>{{ item.recyclingStatus }}</td>

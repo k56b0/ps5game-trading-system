@@ -8,10 +8,35 @@ import { useGameStore } from "@/store/gameStore.ts";
 import PromptMsg from "@/components/PromptMsg.vue";
 
 const useGame = useGameStore();
-const useUser = useUserStore();
-const { myGamesMap, current, pages } = storeToRefs(useGame);
+const { myGamesMap, current, pages, isSearching, searchKeyword } = storeToRefs(useGame);
 const toastMessage = ref('');
 const hoverOrderId = ref<string | number | null>(null);
+// 搜索相关
+const searchInput = ref('');
+
+// 执行搜索
+const performSearch = async () => {
+  const keyword = searchInput.value.trim();
+  if (!keyword) {
+    // 关键词为空 → 回到“全部游戏”列表
+    await useGame.queryAll(1);
+    return;
+  }
+  await useGame.queryByName(keyword, true, 1);
+};
+// 统一的列表刷新，根据当前模式（搜索/全部）自动选择接口
+const refreshList = async (page?: number) => {
+  const targetPage = page ?? current.value;
+  if (isSearching.value) {
+    await useGame.queryByName(searchKeyword.value, true, targetPage);
+  } else {
+    await useGame.queryAll(targetPage);
+  }
+};
+// 页码切换
+const handlePageChange = async (newPage: number) => {
+  await refreshList(newPage);
+};
 // 编辑模态框相关
 const showEditModal = ref(false);
 const selectedGame = ref<game | null>(null);   // 当前正在编辑的游戏对象
@@ -22,7 +47,11 @@ const openEditModal = (game: game) => {
   selectedGame.value = JSON.parse(JSON.stringify(game));
   showEditModal.value = true;
 };
-
+// 删除单个游戏
+async function deleteOne(id: string) {
+  await useGame.delete(id);
+  await refreshList(); // 刷新当前页
+}
 // 关闭模态框
 const closeEditModal = () => {
   showEditModal.value = false;
@@ -43,12 +72,6 @@ const saveGameChanges = async () => {
     toastMessage.value = '更新失败，请检查网络或联系管理员';
   }
 };
-
-// 页码切换、删除、批量删除等函数保持原样...
-const handlePageChange = async (newPage: number) => {
-  current.value = newPage;
-  await useGame.queryAll(newPage);
-};
 const currentPage = computed(() => current.value);
 const allPage = computed(() => pages.value);
 
@@ -63,10 +86,6 @@ const selectAll = computed({
 });
 function toggleSelectAll(event: any) {
   selectAll.value = event.target.checked;
-}
-async function deleteOne(id: string) {
-  await useGame.delete(id);
-  await useGame.queryAll(1);
 }
 async function handleBatchDelete() {
   const selectedIds = myGamesMap.value.filter(g => g.checked).map(g => g.id);
@@ -165,9 +184,25 @@ const saveNewGame = async () => {
     <!-- 已选中数量 + 批量删除按钮（不变） -->
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="d-flex gap-2">
-        <span class="fw-normal text-secondary small">已选中 <span class="badge bg-primary rounded-pill">{{ selectedCount }}</span> 款游戏</span>
+        <span class="fw-normal text-secondary small">
+          已选中 <span class="badge bg-primary rounded-pill">{{ selectedCount }}</span> 款游戏
+        </span>
       </div>
-      <div>
+
+      <!-- 在此处添加搜索栏 -->
+      <div class="d-flex gap-2">
+        <div class="input-group input-group-sm" style="max-width: 250px;">
+          <input
+              v-model="searchInput"
+              type="text"
+              class="form-control"
+              placeholder="搜索游戏名…"
+              @keyup.enter="performSearch"
+          />
+          <button class="btn btn-outline-secondary" type="button" @click="performSearch">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
         <button class="btn btn-sm btn-outline-danger" @click="handleBatchDelete">
           <i class="bi bi-trash3"></i> 批量删除
         </button>
@@ -181,7 +216,6 @@ const saveNewGame = async () => {
       <thead>
       <tr>
         <th class="align-middle text-center"><input class="form-check-input" type="checkbox" :checked="selectAll" @change="toggleSelectAll"></th>
-        <th>游戏编号</th>
         <th>游戏名</th>
         <th>游戏原价</th>
         <th>打折比例</th>
@@ -197,7 +231,6 @@ const saveNewGame = async () => {
           @mouseleave="hoverOrderId = null"
           :class="{ 'hover-active': hoverOrderId === game.id }">
         <td class="align-middle text-center"><input class="form-check-input row-checkbox" type="checkbox" v-model="game.checked"></td>
-        <td>{{ game.id }}</td>
         <td>{{ game.gameName }}</td>
         <td>{{ game.price }}</td>
         <td>{{ game.discount }}</td>

@@ -143,4 +143,20 @@ public class UserController {
             return Result.error(500, "签到失败，请重试", null);
         }
     }
+    //搜索用户
+    @GetMapping("/queryByName/{name}/{pageNum}")
+    public Result queryByName(@PathVariable String name, @PathVariable Integer pageNum) {
+        // 每页 10 条，可根据需求调整
+        Page<User> page = new Page<>(pageNum, 10);
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(User::getUserName, name);
+        Page<User> gamePage = userService.page(page, queryWrapper);
+
+        if (gamePage.getTotal() > 0) {
+            return Result.success(gamePage);
+        } else {
+            // 无结果时也返回成功，空列表让前端友好展示
+            return Result.success(gamePage);
+        }
+    }
 }

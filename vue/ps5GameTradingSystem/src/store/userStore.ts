@@ -67,21 +67,19 @@ export const useUserStore = defineStore('userStore',{
         },
         async queryAll(data: { pageNum: number }) {
             try {
-                // 根据实际 baseURL 调整路径
                 const response = await httpAxios.get(`/user/queryAll/${data.pageNum}`);
                 const result = response.data;
-
                 if (result.code === 200) {
-                    // 将records存入响应式变量
-                    this.myUsers = result.data.records
-                    //存入翻页信息 直接赋值给 state 属性，Pinia 会自动处理响应性
+                    this.myUsers = result.data.records;
                     this.current = result.data.current;
                     this.pages = result.data.pages;
                     this.total = result.data.total;
-                    //一个 action 来获取后端数据并转换成前端所需格式
-                    // 将后端数据映射为前端所需格式
+                    // 退出搜索模式
+                    this.isSearching = false;
+                    this.searchKeyword = '';
+
                     this.myUsersMap = this.myUsers.map(item => ({
-                        id:   item.id,
+                        id: item.id,
                         userName: item.userName,
                         gender: item.gender,
                         birth: item.birth,
@@ -92,9 +90,9 @@ export const useUserStore = defineStore('userStore',{
                         answer: item.answer,
                         checkTime: item.checkTime,
                         money: item.money,
-                        isManage:item.isManage,
-                        checked: false // 初始化未选中
-                    }))
+                        isManage: item.isManage,
+                        checked: false,
+                    }));
                 } else {
                     console.error('查询失败', result.message);
                 }
@@ -196,8 +194,62 @@ export const useUserStore = defineStore('userStore',{
             })
             // ✅【新加】退出时清除本地存储
             localStorage.removeItem('userInfo')
-        }
+        },
+        // ✅ 新增：按用户名模糊搜索
+        async queryByName(userName: string, isSearch: boolean, pageNum = 1) {
+            try {
+                const response = await httpAxios.get(
+                    `/user/queryByName/${encodeURIComponent(userName)}/${pageNum}`
+                );
+                const result = response.data;
+                if (result.code === 200) {
+                    if (isSearch) {
+                        this.myUsers = result.data.records;
+                        this.current = result.data.current;
+                        this.pages = result.data.pages;
+                        this.total = result.data.total;
+                        this.searchKeyword = userName;
+                        this.isSearching = true;
+
+                        this.myUsersMap = this.myUsers.map(item => ({
+                            id: item.id,
+                            userName: item.userName,
+                            gender: item.gender,
+                            birth: item.birth,
+                            password: item.password,
+                            checkIn: item.checkIn,
+                            email: item.email,
+                            address: item.address,
+                            answer: item.answer,
+                            checkTime: item.checkTime,
+                            money: item.money,
+                            isManage: item.isManage,
+                            checked: false,
+                        }));
+                    } else {
+                        // 如果不需要支持其他场景，可以留空
+                    }
+                } else {
+                    console.error('搜索失败', result.message);
+                    if (isSearch) {
+                        this.myUsers = [];
+                        this.myUsersMap = [];
+                        this.searchKeyword = '';
+                        this.isSearching = false;
+                    }
+                }
+            } catch (error) {
+                console.error('网络错误', error);
+                if (isSearch) {
+                    this.myUsers = [];
+                    this.myUsersMap = [];
+                    this.searchKeyword = '';
+                    this.isSearching = false;
+                }
+            }
+        },
     },
+
     // 状态
     state(){
         return {
@@ -223,7 +275,10 @@ export const useUserStore = defineStore('userStore',{
                     checkTime:'2025-01-01 00:00:00 ',
                     money:0,
                     isManage:1
-                })
+                }),
+            // ✅ 新增搜索相关状态
+            searchKeyword: '',
+            isSearching: false,
         }
     },
     // 计算

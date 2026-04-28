@@ -7,11 +7,47 @@ import { useUserStore } from '@/store/userStore.ts';
 import PromptMsg from "@/components/PromptMsg.vue";
 
 const userStore = useUserStore();
-const { myUsersMap, current, pages } = storeToRefs(userStore);
+// ✅ 解构时加上新状态
+const { myUsersMap, current, pages, isSearching, searchKeyword } = storeToRefs(userStore);
 const toastMessage = ref('');
 const hoverUserId = ref<string | number | null>(null);
 
-// 编辑模态框
+// 搜索
+const searchInput = ref('');
+
+const performSearch = async () => {
+  const keyword = searchInput.value.trim();
+  if (!keyword) {
+    // 空关键词 → 返回全部列表
+    await userStore.queryAll({ pageNum: 1 });
+    return;
+  }
+  await userStore.queryByName(keyword, true, 1);
+};
+
+// ✅ 统一刷新：根据当前是否在搜索模式决定调用哪个接口
+const refreshList = async (page?: number) => {
+  const targetPage = page ?? current.value;
+  if (isSearching.value) {
+    await userStore.queryByName(searchKeyword.value, true, targetPage);
+  } else {
+    await userStore.queryAll({ pageNum: targetPage });
+  }
+};
+
+// 分页切换
+const handlePageChange = async (newPage: number) => {
+  await refreshList(newPage);
+};
+
+const currentPage = computed(() => current.value);
+const allPage = computed(() => pages.value);
+
+onMounted(async () => {
+  await userStore.queryAll({ pageNum: 1 });
+});
+
+// ---------- 编辑 ----------
 const showEditModal = ref(false);
 const selectedUser = ref<user | null>(null);
 
@@ -30,41 +66,19 @@ const saveUserChanges = async () => {
   const success = await userStore.update(selectedUser.value);
   if (success) {
     toastMessage.value = '用户信息更新成功';
-    await userStore.queryAll({ pageNum: current.value });
+    await refreshList();  // 改为刷新当前列表
     closeEditModal();
   } else {
     toastMessage.value = '更新失败，请检查网络或联系管理员';
   }
 };
 
-// 分页
-const handlePageChange = async (newPage: number) => {
-  current.value = newPage;
-  await userStore.queryAll({ pageNum: newPage });
-};
-const currentPage = computed(() => current.value);
-const allPage = computed(() => pages.value);
-
-onMounted(async () => {
-  await userStore.queryAll({ pageNum: 1 });
-});
-
-// 多选相关
-const selectedCount = computed(() => myUsersMap.value.filter(u => u.checked).length);
-const selectAll = computed({
-  get: () => myUsersMap.value.length > 0 && myUsersMap.value.every(u => u.checked),
-  set: (val) => myUsersMap.value.forEach(u => u.checked = val)
-});
-function toggleSelectAll(event: any) {
-  selectAll.value = event.target.checked;
-}
-
-// 删除单个
+// ---------- 删除 ----------
 async function deleteOne(id: string) {
   const success = await userStore.delete(id);
   if (success) {
     toastMessage.value = '删除成功';
-    await userStore.queryAll({ pageNum: current.value });
+    await refreshList();
   } else {
     toastMessage.value = '删除失败';
   }
@@ -82,7 +96,7 @@ async function handleBatchDelete() {
   for (let id of selectedIds) {
     await userStore.delete(id as string);
   }
-  await userStore.queryAll({ pageNum: current.value });
+  await refreshList();
 }
 
 // ---------- 添加用户 ----------
@@ -110,7 +124,7 @@ const newUser = ref<user>({
   answer: '',
   checkTime: '',
   money: 0,
-  isManage: 1   // 默认为普通用户
+  isManage: 1,
 });
 
 const openAddModal = () => {
@@ -124,9 +138,9 @@ const openAddModal = () => {
     email: '',
     address: '',
     answer: '',
-    checkTime: new Date().toISOString().slice(0, 19).replace('T', ' '), // ✅ 添加当前时间，格式：YYYY-MM-DD HH:mm:ss
+    checkTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
     money: 0,
-    isManage: 1
+    isManage: 1,
   };
   showAddModal.value = true;
 };
@@ -140,19 +154,28 @@ const saveNewUser = async () => {
     toastMessage.value = '请填写用户名和邮箱';
     return;
   }
-  // 可选的简单密码默认值
   if (!newUser.value.password) {
     newUser.value.password = '123456';
   }
   const success = await userStore.add(newUser.value);
   if (success) {
     toastMessage.value = '用户添加成功';
-    await userStore.queryAll({ pageNum: current.value });
+    await refreshList();
     closeAddModal();
   } else {
     toastMessage.value = '添加失败，请检查网络或联系管理员';
   }
 };
+
+// 多选逻辑
+const selectedCount = computed(() => myUsersMap.value.filter(u => u.checked).length);
+const selectAll = computed({
+  get: () => myUsersMap.value.length > 0 && myUsersMap.value.every(u => u.checked),
+  set: (val) => myUsersMap.value.forEach(u => u.checked = val),
+});
+function toggleSelectAll(event: any) {
+  selectAll.value = event.target.checked;
+}
 </script>
 
 <template>
@@ -161,12 +184,25 @@ const saveNewUser = async () => {
       <div class="d-flex gap-2">
         <span class="fw-normal text-secondary small">已选中 <span class="badge bg-primary rounded-pill">{{ selectedCount }}</span> 名用户</span>
       </div>
-      <div>
+      <!-- 在此处添加搜索栏 -->
+      <div class="d-flex gap-2">
+        <div class="input-group input-group-sm" style="max-width: 250px;">
+          <input
+              v-model="searchInput"
+              type="text"
+              class="form-control"
+              placeholder="搜索用户名…"
+              @keyup.enter="performSearch"
+          />
+          <button class="btn btn-outline-secondary" type="button" @click="performSearch">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
         <button class="btn btn-sm btn-outline-danger" @click="handleBatchDelete">
           <i class="bi bi-trash3"></i> 批量删除
         </button>
         <button class="btn btn-sm btn-outline-success" @click="openAddModal">
-          <i class="bi bi-person-plus"></i> 添加用户
+          <i class="bi bi-shield-plus"></i> 添加用户
         </button>
       </div>
     </div>
